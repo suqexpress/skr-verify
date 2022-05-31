@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:salesmen_app/screen/edit_shop/edit_shop_image.dart';
 import 'package:salesmen_app/screen/edit_shop/edit_shop_screen.dart';
 import 'package:salesmen_app/screen/login_screen/login_screen.dart';
 import 'package:salesmen_app/screen/main_screeen/mainScreen.dart';
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
           color: Colors.blue
         )
       ),
-      home: EditShopScreen(),
+      home: SplashScreen(),
     );
   }
 }

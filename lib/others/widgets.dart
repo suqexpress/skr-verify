@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:salesmen_app/others/style.dart';
+import 'package:salesmen_app/screen/edit_shop/edit_shop_screen.dart';
 
 class LoginTextField extends StatelessWidget {
   LoginTextField(
@@ -472,8 +473,12 @@ class _CustomerCardState extends State<CustomerCard> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(widget.menuButton.length, (index) {
                 return InkWell(
-                    // onTap: () async {
-                    //   _onSelected(index);
+                     onTap: () async {
+                       _onSelected(index);
+                        if(index==1){
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>EditShopScreen()));
+                        }
+                     },
                     //   // if (index == 1) {
                     //   //   if (templat == null) {
                     //   //     Fluttertoast.showToast(
@@ -623,6 +628,43 @@ class VariableText extends StatelessWidget {
         decoration: underlined
             ? TextDecoration.underline
             : (linethrough ? TextDecoration.lineThrough : TextDecoration.none),
+      ),
+    );
+  }
+}
+class EditTextField extends StatelessWidget {
+  EditTextField({this.label,this.hintText,this.controller,this.onChange});
+  final label;
+  final hintText;
+  final controller;
+  final onChange;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 10,),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Text(label,style: TextStyle(color: themeColor1),),
+          ),
+          Container(
+              margin: EdgeInsets.symmetric(vertical: 5),
+              child: TextField(
+                controller: controller,
+                onChanged: onChange,
+                decoration:InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(vertical: 7,horizontal: 15),
+                  hintText: hintText,
+                  border: new OutlineInputBorder(
+                      borderSide: new BorderSide(color: Colors.grey)),
+                  enabledBorder: new OutlineInputBorder(
+                      borderSide: new BorderSide(color: themeColor1)),
+                ),
+              )),
+        ],
       ),
     );
   }

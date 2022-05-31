@@ -28,9 +28,44 @@ class _MainScreenState extends State<MainScreen> {
           Center(child: Text("Landhi Korangi   ",style: TextStyle(color: Colors.white),))
         ],
       ),
-      drawer: Drawer(child: DrawerHeader(
-        child: Text("talha"),),),
-    body: SingleChildScrollView(
+      drawer: Drawer(
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            UserAccountsDrawerHeader(
+              accountName: Text("Talha Iqbal"),
+              accountEmail: Text("talhaiqbal246@gmail.com"),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.orange,
+                child: Text(
+                  "A",
+                  style: TextStyle(fontSize: 40.0,color: Colors.white),
+                ),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.home), title: Text("Home"),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.settings), title: Text("Settings"),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.contacts), title: Text("Contact Us"),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 15),
         child: Column(children: [

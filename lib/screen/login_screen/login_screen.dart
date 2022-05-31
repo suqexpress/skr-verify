@@ -22,29 +22,29 @@ class _LoginScreenState extends State<LoginScreen> {
     var height=MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
-        child: Container(
-          color: themeColor1.withOpacity(0.8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                height: width*0.6,
-                child: Image.asset('assets/illustration/login.png',scale: 2,),),
-              Stack(
-                children:[ 
-                  Container(
+        child: Stack(
+          alignment: Alignment.center,
+          children:[
+            Container(
+            color: themeColor1.withOpacity(0.8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  child: Image.asset('assets/illustration/login.png',width: width *0.8,height: width *0.8,),),
+                Container(
+                  child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(topLeft: Radius.circular(30),topRight:Radius.circular(30), )
                   ),
-                  height: width *1.2,
                   child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    SizedBox(height: 35,),
+                    SizedBox(height: 20,),
                     Container(
                         margin: EdgeInsets.symmetric(horizontal: 20),
                         padding: EdgeInsets.only(bottom: 5),
@@ -56,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -111,18 +111,25 @@ class _LoginScreenState extends State<LoginScreen> {
                                   borderRadius: BorderRadius.circular(7)
                               ),
                               child: Text("LOGIN NOW",style:GoogleFonts.archivo(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w300, ) ),),
-                          )
+                          ),
+                          SizedBox(height: 20,)
                         ],),
                     )
                   ],
                     ),
-                ),
-                  loading?Loading():Container()
-                ]
-              )
-            ],
+                    ),
+                )
+              ],
+            ),
           ),
-        )
+            loading?Container(
+                color: Colors.white.withOpacity(0.5),
+                width: width,
+                height: height* 0.87,
+                alignment: Alignment.center,
+                child: Loading()):Container()
+          ]
+        ),
       ),
     );
   }
@@ -133,14 +140,12 @@ class Loading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var width=MediaQuery.of(context).size.width;
-    var height=MediaQuery.of(context).size.height;
     return Container(
       alignment: Alignment.center,
-      color: themeColor1.withOpacity(0.6),
-        width: width,
-        height: width*1.3,
-        child: LoadingAnimationWidget.threeArchedCircle(color: Colors.white.withOpacity(0.8), size:100 ));
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(30),topRight:Radius.circular(30), )
+        ),
+        child: LoadingAnimationWidget.threeArchedCircle(color: themeColor1, size:100 ));
   }
 }
 
