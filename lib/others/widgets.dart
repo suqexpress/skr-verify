@@ -67,7 +67,6 @@ class CustomerCard extends StatefulWidget {
     this.dues,
     this.lastTrans,
     this.outstanding,
-    this.shopAssigned,
     this.lat,
     this.long,
     required this.showLoading,
@@ -90,7 +89,6 @@ class CustomerCard extends StatefulWidget {
   final dues;
   final lastTrans;
   final outstanding;
-  final shopAssigned;
   final lat;
   final long;
   final customerData;
@@ -341,7 +339,8 @@ class _CustomerCardState extends State<CustomerCard> {
                         Spacer(),
                         VariableText(
                           //text: 'Muhammad Ali',
-                          text: widget.lastVisit.toString(),
+                          text:"--",
+                          //widget.lastVisit.toString(),
                           // widget.customerData.lastVisitDay
                           //     .toString(),
                           // text: shopdetails[index].ownerName,
@@ -371,7 +370,8 @@ class _CustomerCardState extends State<CustomerCard> {
                         Spacer(),
                         VariableText(
                           //text: 'Muhammad Ali',
-                          text: widget.lastTrans.toString(),
+                          text:"--",
+                          //widget.lastTrans.toString(),
                           // widget.customerData.lastTransDay
                           //     .toString(),
                           // text: shopdetails[index].ownerName,
@@ -408,10 +408,11 @@ class _CustomerCardState extends State<CustomerCard> {
                         Spacer(),
                         VariableText(
                           //text: 'Muhammad Ali',
-                          text: widget.dues.toString() == '0'
-                              ? '0'
-                              : widget.f
-                                  .format(double.parse(widget.dues.toString())),
+                          text: "--",
+                          //widget.dues.toString() == '0'
+                              // ? '0'
+                              // : widget.f
+                              //     .format(double.parse(widget.dues.toString())),
                           // text: shopdetails[index].ownerName,
                           fontsize: 11,
                           fontcolor: Colors.grey,
@@ -439,10 +440,11 @@ class _CustomerCardState extends State<CustomerCard> {
                         Spacer(),
                         VariableText(
                           //text: 'Muhammad Ali',
-                          text: widget.outstanding.toString() == '0'
-                              ? '0'
-                              : widget.f.format(
-                                  double.parse(widget.outstanding.toString())),
+                          text:"--",
+                          // widget.outstanding.toString() == '0'
+                          //     ? '0'
+                          //     : widget.f.format(
+                          //         double.parse(widget.outstanding.toString())),
                           // text: shopdetails[index].ownerName,
                           fontsize: 11,
                           fontcolor: Colors.grey,
@@ -479,7 +481,7 @@ class _CustomerCardState extends State<CustomerCard> {
                      onTap: () async {
                        _onSelected(index);
                         if(index==1){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>EditShopScreen()));
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>EditShopScreen(customer: widget.customerData,)));
                         }
                      },
                     //   // if (index == 1) {

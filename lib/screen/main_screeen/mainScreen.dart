@@ -34,18 +34,10 @@ class _MainScreenState extends State<MainScreen> {
     actualAddress = "Searching....";
     userLatLng =Coordinates(_location.latitude, _location.longitude);
     print("userLatLng: " + userLatLng.toString());
-    var addresses = await Geocoder.local.findAddressesFromCoordinates(userLatLng);
+    var addresses = await Geocoder.google("AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI").findAddressesFromCoordinates(userLatLng);
     actualAddress = addresses.first.subLocality.toString();
     print(actualAddress);
     setState(() {});
-  }
-  double calculateDistance(double lat1,double lon1,double lat2,double lon2){
-    var p = 0.017453292519943295;
-    var c = cos;
-    var a = 0.5 - c((lat2 - lat1) * p)/2 +
-        c(lat1 * p) * c(lat2 * p) *
-            (1 - c((lon2 - lon1) * p))/2;
-    return 12742 * asin(sqrt(a));
   }
   setLoading(bool value){
     setState(() {
@@ -57,19 +49,17 @@ class _MainScreenState extends State<MainScreen> {
     var dio = Dio();
     var response= await dio.get("https://erp.suqexpress.com/api/customer").catchError((e)=>print("error: $e"));
     if (response.statusCode==200){
-      var data=jsonDecode(response.toString());
-      debugPrint(data.toString());
+      // var data=jsonDecode(response.toString());
+      debugPrint("get customer success");
       int i=0;
-      for (var shop in data['data']){
-        debugPrint(shop['lat'].toString());
-        debugPrint(shop['long'].toString());
+      for (var shop in response.data){
         double dist= Geolocator.distanceBetween(userLatLng.latitude, userLatLng.longitude, double.parse(shop['lat'].toString()=="null"?1.toString():shop['lat'].toString()),double.parse(shop['long'].toString()=="null"?1.toString():shop['long'].toString()));
         //calculateDistance(userLatLng.latitude, userLatLng.longitude, double.parse(shop['lat']), double.parse(shop['long'].toString()));
         customer.add(CustomerModel.fromJson(shop,dist));
         debugPrint("distsnce: ${dist.toString()} $i ${customer[i].id}");
         i++;
       }
-       setState(() {
+      setState(() {
          customer.sort((a, b) => a.distance.compareTo(b.distance));
        });
     }else{
@@ -89,8 +79,6 @@ class _MainScreenState extends State<MainScreen> {
     var media = MediaQuery.of(context).size;
     double height = media.height;
     var width = media.width;
-    debugPrint("o");
-    setState(() {});
     return Scaffold(
       appBar: AppBar(
         backgroundColor:themeColor1,
@@ -152,7 +140,7 @@ class _MainScreenState extends State<MainScreen> {
                 child: customer.length<1?Center(child:Text("No Shop Found")):ListView.builder(
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    itemCount: customer.length,
+                    itemCount: customer.length>10?10:customer.length,
                     itemBuilder:(context,index){
                       return CustomerCard(
                         height: height,
@@ -161,15 +149,14 @@ class _MainScreenState extends State<MainScreen> {
                         menuButton: menuButton,
                         code: customer[index].custOldCode,
                         category: customer[index].custOldCode,
-                        shopName: customer[index].custOldCode,
-                        address:customer[index].custOldCode,
-                        name: customer[index].custOldCode,
-                        phoneNo: customer[index].custOldCode,
-                        lastVisit: customer[index].custOldCode,
-                        dues: 3000,
-                        lastTrans:customer[index].custOldCode,
-                        outstanding: 2000,
-                        shopAssigned: customer[index].custOldCode,
+                        shopName: customer[index].userData!.firstName,
+                        address:customer[index].custAddress,
+                        name: customer[index].custPrimName,
+                        phoneNo: customer[index].custPrimNb,
+                        lastVisit: "--",
+                        dues: "--",
+                        lastTrans:"--",
+                        outstanding: "--",
                         lat: customer[index].lat,
                         long: customer[index].long,
                         customerData: customer[index],

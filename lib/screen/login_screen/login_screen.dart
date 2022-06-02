@@ -34,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
     print("+92"+password.text.substring(1));
     print(password.text);
     var response=await Auth.getLogin(phoneNo:"+92"+phoneNo.text.substring(1), password:password.text,onSuccess: (response)async{
-      print("status ${response.statusCode}");
       if(response.statusCode==200){
         var data=jsonDecode(response.toString());
         print(data['success']);
@@ -133,8 +132,8 @@ class _LoginScreenState extends State<LoginScreen> {
       Alert(
         context: context,
         type: AlertType.error,
-        title: "Api`s not Responses",
-        desc: "please try again after few Mints",
+        title: "Authentication Failed",
+        desc: "check phone and password",
         buttons: [
           DialogButton(
             color:themeColor1 ,
@@ -201,8 +200,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ],
                           ),
-                          LoginTextField(width: width,label: "Enter your name",onchange: (value){},controller:phoneNo,obscureText: false,keyboardType: TextInputType.phone,),
-                          LoginTextField(width: width,label: "Enter your password",onchange: (value){},controller:password ,obscureText: true,keyboardType: TextInputType.visiblePassword,),
+                          LoginTextField(width: width,label: "Phone no (03012070920)",onchange: (value){},controller:phoneNo,obscureText: false,keyboardType: TextInputType.phone,),
+                          LoginTextField(width: width,label: "Password (555)",onchange: (value){},controller:password ,obscureText: true,keyboardType: TextInputType.visiblePassword,),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -221,7 +220,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Text("Keep me Logging",style: GoogleFonts.archivo(fontSize: 12,color: themeColor1.withOpacity(0.8),fontWeight: FontWeight.w300, ),textAlign: TextAlign.center, ),
 
                                 ],),
-                              Text("Forget password?",style: GoogleFonts.archivo(fontSize: 12,color: themeColor1.withOpacity(0.8),fontWeight: FontWeight.w300, ),textAlign: TextAlign.center, ),
+                              InkWell(
+                                  onTap: (){
+                                    Alert(
+                                      context: context,
+                                      type: AlertType.error,
+                                      title: "Go to Salesman App",
+                                      desc: "For reset your password use salesman app",
+                                      buttons: [
+                                        DialogButton(
+                                          child: Text(
+                                            "Cancel",
+                                            style: TextStyle(color: Colors.white, fontSize: 20),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          width: 120,
+                                        )
+                                      ],
+                                    ).show();
+                                  },
+                                  child: Text("Forget password?",style: GoogleFonts.archivo(fontSize: 12,color: themeColor1.withOpacity(0.8),fontWeight: FontWeight.w300, ),textAlign: TextAlign.center, )),
 
                             ],),
                           InkWell(

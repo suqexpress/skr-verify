@@ -124,8 +124,8 @@ class CustomerModel {
     contactPerson3 = json['contact_person3'];
     phone3 = json['phone3'];
     cnicExp = json['cnic_exp'];
-    lat = double.parse(json['lat'].toString());
-    long = double.parse(json['long'].toString());
+    lat = double.parse(json['lat'].toString()=='null'?"1":json['lat'].toString());
+    long = double.parse(json['long'].toString()=="null"?"1":json['long'].toString());
     paymentTerm = json['payment_term'];
     salemanName = json['saleman_name'];
     cr30Days = json['cr_30_days'];
@@ -133,7 +133,7 @@ class CustomerModel {
     cr180Days = json['cr_180_days'];
     ntn = json['ntn'];
     distance=distance;
-    balance = double.parse(json['balance'].toString());
+    balance = double.parse(json['balance'].toString()=="null"?"0.00":json['balance'].toString());
     userData = json['user_data'] != null
         ? new UserData.fromJson(json['user_data'])
         : null;

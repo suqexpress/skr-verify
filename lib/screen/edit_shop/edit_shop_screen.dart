@@ -1,16 +1,26 @@
 import 'dart:io';
-
+import 'package:dio/dio.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:page_indicator/page_indicator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:salesmen_app/model/AreaModel.dart';
+import 'package:salesmen_app/model/cityModel.dart';
+import 'package:salesmen_app/model/countryModel.dart';
+import 'package:salesmen_app/model/customerModel.dart';
+import 'package:salesmen_app/model/marketModel.dart';
+import 'package:salesmen_app/model/provincesModel.dart';
 import 'package:salesmen_app/others/style.dart';
 import 'package:salesmen_app/others/widgets.dart';
 import 'package:salesmen_app/screen/edit_shop/edit_shop_details.dart';
 import 'package:salesmen_app/screen/edit_shop/edit_shop_image.dart';
+import 'package:salesmen_app/screen/login_screen/login_screen.dart';
 
 class EditShopScreen extends StatefulWidget {
+  EditShopScreen({required this.customer});
+  CustomerModel customer;
   @override
   State<EditShopScreen> createState() => _EditShopScreenState();
 }
@@ -19,294 +29,33 @@ class _EditShopScreenState extends State<EditShopScreen> {
   final ImagePicker _picker = ImagePicker();
   String firstCity = 'Karachi';
   String firstCountry = 'Pakistan';
+  bool isLoading=false;
   bool visible = false;
-  var country = [
-    "Afghanistan",
-    "Albania",
-    "Algeria",
-    "Andorra",
-    "Angola",
-    "Antigua & Deps",
-    "Argentina",
-    "Armenia",
-    "Australia",
-    "Austria",
-    "Azerbaijan",
-    "Bahamas",
-    "Bahrain",
-    "Bangladesh",
-    "Barbados",
-    "Belarus",
-    "Belgium",
-    "Belize",
-    "Benin",
-    "Bhutan",
-    "Bolivia",
-    "Bosnia Herzegovina",
-    "Botswana",
-    "Brazil",
-    "Brunei",
-    "Bulgaria",
-    "Burkina",
-    "Burundi",
-    "Cambodia",
-    "Cameroon",
-    "Canada",
-    "Cape Verde",
-    "Central African Rep",
-    "Chad",
-    "Chile",
-    "China",
-    "Colombia",
-    "Comoros",
-    "Congo",
-    "Congo {Democratic Rep}",
-    "Costa Rica",
-    "Croatia",
-    "Cuba",
-    "Cyprus",
-    "Czech Republic",
-    "Denmark",
-    "Djibouti",
-    "Dominica",
-    "Dominican Republic",
-    "East Timor",
-    "Ecuador",
-    "Egypt",
-    "El Salvador",
-    "Equatorial Guinea",
-    "Eritrea",
-    "Estonia",
-    "Ethiopia",
-    "Fiji",
-    "Finland",
-    "France",
-    "Gabon",
-    "Gambia",
-    "Georgia",
-    "Germany",
-    "Ghana",
-    "Greece",
-    "Grenada",
-    "Guatemala",
-    "Guinea",
-    "Guinea-Bissau",
-    "Guyana",
-    "Haiti",
-    "Honduras",
-    "Hungary",
-    "Iceland",
-    "India",
-    "Indonesia",
-    "Iran",
-    "Iraq",
-    "Ireland {Republic}",
-    "Israel",
-    "Italy",
-    "Ivory Coast",
-    "Jamaica",
-    "Japan",
-    "Jordan",
-    "Kazakhstan",
-    "Kenya",
-    "Kiribati",
-    "Korea North",
-    "Korea South",
-    "Kosovo",
-    "Kuwait",
-    "Kyrgyzstan",
-    "Laos",
-    "Latvia",
-    "Lebanon",
-    "Lesotho",
-    "Liberia",
-    "Libya",
-    "Liechtenstein",
-    "Lithuania",
-    "Luxembourg",
-    "Macedonia",
-    "Madagascar",
-    "Malawi",
-    "Malaysia",
-    "Maldives",
-    "Mali",
-    "Malta",
-    "Marshall Islands",
-    "Mauritania",
-    "Mauritius",
-    "Mexico",
-    "Micronesia",
-    "Moldova",
-    "Monaco",
-    "Mongolia",
-    "Montenegro",
-    "Morocco",
-    "Mozambique",
-    "Myanmar, {Burma}",
-    "Namibia",
-    "Nauru",
-    "Nepal",
-    "Netherlands",
-    "New Zealand",
-    "Nicaragua",
-    "Niger",
-    "Nigeria",
-    "Norway",
-    "Oman",
-    "Pakistan",
-    "Palau",
-    "Panama",
-    "Papua New Guinea",
-    "Paraguay",
-    "Peru",
-    "Philippines",
-    "Poland",
-    "Portugal",
-    "Qatar",
-    "Romania",
-    "Russian Federation",
-    "Rwanda",
-    "St Kitts & Nevis",
-    "St Lucia",
-    "Saint Vincent & the Grenadines",
-    "Samoa",
-    "San Marino",
-    "Sao Tome & Principe",
-    "Saudi Arabia",
-    "Senegal",
-    "Serbia",
-    "Seychelles",
-    "Sierra Leone",
-    "Singapore",
-    "Slovakia",
-    "Slovenia",
-    "Solomon Islands",
-    "Somalia",
-    "South Africa",
-    "South Sudan",
-    "Spain",
-    "Sri Lanka",
-    "Sudan",
-    "Suriname",
-    "Swaziland",
-    "Sweden",
-    "Switzerland",
-    "Syria",
-    "Taiwan",
-    "Tajikistan",
-    "Tanzania",
-    "Thailand",
-    "Togo",
-    "Tonga",
-    "Trinidad & Tobago",
-    "Tunisia",
-    "Turkey",
-    "Turkmenistan",
-    "Tuvalu",
-    "Uganda",
-    "Ukraine",
-    "United Arab Emirates",
-    "United Kingdom",
-    "United States",
-    "Uruguay",
-    "Uzbekistan",
-    "Vanuatu",
-    "Vatican City",
-    "Venezuela",
-    "Vietnam",
-    "Yemen",
-    "Zambia",
-    "Zimbabwe"
-  ];
-  var city = [
-    "Abbottabad",
-    "Ahmadpur East",
-    "Bahawalnagar",
-    "Bahawalpur",
-    "Burewala",
-    "Chakwal",
-    "Charsada",
-    "Chichawatni",
-    "Chiniot",
-    "Chishtian",
-    "Dadu",
-    "Daska",
-    "Dera Ghazi Khan",
-    "Dera Ismail Khan",
-    "Faisalabad",
-    "Farooka",
-    "Gojra",
-    "Gujranwala",
-    "Gujrat",
-    "Hafizabad",
-    "Hyderabad",
-    "Islamabad",
-    "Jacobabad",
-    "Jaranwala",
-    "Jhelum",
-    "Kamalia",
-    "Kamoke",
-    "Kandhkot",
-    "Karachi",
-    "Kasur",
-    "Khairpur",
-    "Khanewal",
-    "Khanpur",
-    "Khushab",
-    "Khuzdar",
-    "Kohat",
-    "Kot Adu",
-    "Lahore",
-    "Larkana",
-    "Mandi Bahauddin",
-    "Mansehra",
-    "Mardan",
-    "Mianwali",
-    "Mingora",
-    "Mirpur Khas",
-    "Multan",
-    "Muridke",
-    "Muzaffargarh",
-    "Nawabshah",
-    "Nowshera",
-    "Okara",
-    "Pakpattan",
-    "Peshawar",
-    "Quetta",
-    "Rahim Yar Khan",
-    "Rawalpindi",
-    "Sadiqabad",
-    "Sahiwal",
-    "Sargodha",
-    "Sheikhupura",
-    "Shikarpur",
-    "Sialkot",
-    "Sukkur",
-    "Swabi",
-    "Tando Adam",
-    "Tando Allahyar",
-    "Vehari",
-    "Vehari",
-    "Wah Cantonment",
-    "Wazirabad",
-    "Add Market"
-  ];
-  var controller,
-      controller1,
-      controller2,
-      controller3,
-      controller4,
-      controller5,
-      controller6,
-      controller7,
-      controller8,
-      controller9,
-      controller10,
-      controller11,
-      controller12,
-      controller13 = TextEditingController();
+  var customerCode,
+      shopName,
+      category,
+      ownerName,
+      ownerNo,
+      ownerCNIC,
+      expireDateCNIC,
+      customerAddress,
+      person2,
+      phoneNo2,
+      person3,
+      phoneNo3,
+      marketsController = TextEditingController();
   XFile? image,image1,image2,image3,image4,image5,image6,image7,image8;
   bool loading=false,loading1=false,loading2=false,loading3=false,loading4=false,loading5=false,loading6=false,loading7=false,loading8=false;
+  List<CountryModel> countries=[];
+  List<ProvincesModel> sates=[];
+  List<CityModel> cities=[];
+  List<AreaModel>areas=[];
+  List<MarketModel>markets=[];
+  CountryModel countryValue=CountryModel();
+   ProvincesModel stateValue=ProvincesModel();
+   CityModel cityValue=CityModel();
+   AreaModel areaValue=AreaModel();
+   MarketModel marketValue=MarketModel();
   getImage(ImageSource source,String name)async{
     if(name=="owner"){
       var camera=await Permission.camera.request();
@@ -378,7 +127,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
         });
       }
     }
-    else if(name=="SignBoard"){
+    else if(name=="signboard"){
 
       var camera=await Permission.camera.request();
       var gallery=await Permission.storage.request();
@@ -396,7 +145,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
         });
       }
     }
-    else if(name=="cnic_front"){
+    else if(name=="cinc_front"){
 
       var camera=await Permission.camera.request();
       var gallery=await Permission.storage.request();
@@ -469,11 +218,131 @@ class _EditShopScreenState extends State<EditShopScreen> {
       }
     }
   }
-  getCountry(){
+  getCountry()async{
+    setLoading(true);
     var dio=Dio();
+    var response=await dio.get("https://erp.suqexpress.com/api/country");
+    for(var country in response.data['data']){
+      countries.add(CountryModel.fromJson(country));
+    }
+    countryValue=countries[0];
+    getState(countries[0].id.toString());
+  }
+  getState(String countryId)async{
+    setLoading(true);
+    sates.clear();
+    var dio=Dio();
+    var response1=await dio.get("https://erp.suqexpress.com/api/state/$countryId}");
+    for (var state in response1.data['data']){
+      sates.add(ProvincesModel.fromJson(state));
+    }
+    stateValue=sates[0];
+    getCity(sates[0].id.toString());
+  }
+  getCity(String id)async{
+    setLoading(true);
+    cities.clear();
+    var dio=Dio();
+    var response2=await dio.get("https://erp.suqexpress.com/api/city/$id");
+    for (var city in response2.data['data']){
+      cities.add(CityModel.fromJson(city));
+    }
+    cityValue=cities[0];
+    getArea(cities[0].id.toString());
+  }
+  getArea(String id)async{
+    setLoading(true);
+    areas.clear();
+    var dio=Dio();
+    var response3=await dio.get("https://erp.suqexpress.com/api/area/$id");
+    for(var area in response3.data['data']){
+      areas.add(AreaModel.fromJson(area));
+    }
+    areaValue=areas[0];
+    getMarket(areas[0].id.toString());
+  }
+  getMarket(String id)async{
+    setLoading(true);
+    markets.clear();
+    var dio=Dio();
+    var response4=await dio.get("https://erp.suqexpress.com/api/market/$id");
+    if(response4.data!=null) {
+      for (var market in response4.data['data']) {
+        markets.add(MarketModel.fromJson(market));
+      }
+      marketValue = markets[0];
+    }
+      setLoading(false);
+  }
+  setLoading(bool value){
+    setState(() {
+      isLoading=value;
+    });
+  }
+  @override
+  void initState() {
+    getCountry();
+    super.initState();
+  }
+  getMarketList(String name,int areaId)async{
+    markets.clear();
+    setLoading(true);
+    var dio=Dio();
+    FormData formData = new FormData.fromMap({
+      'name': name,
+      'area_id': areaId
+    });
+    var response = await dio.post("https://erp.suqexpress.com/api/market", data: formData,
+      options: Options(
+        contentType: "application/json",
+      ),
+    ).then((value) =>   Alert(
+      context: context,
+      type: AlertType.success,
+      title: "Market Successfully Added",
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Cancel",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          width: 120,
+        )
+      ],
+    ).show()).onError((error, stackTrace) =>   Alert(
+      context: context,
+      type: AlertType.error,
+      title: "Edit Fail",
+      desc: "Please check internet ",
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Cancel",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          width: 120,
+        )
+      ],
+    ).show());
+    visible = visible ? false : true;
+    var response4=await dio.get("https://erp.suqexpress.com/api/market/$areaId");
+    for(var market in response4.data['data']){
+      markets.add(MarketModel.fromJson(market));
+    }
+    marketValue=markets[0];
+    setLoading(false);
   }
   @override
   Widget build(BuildContext context) {
+    var media=MediaQuery.of(context);
+    var width=media.size.width;
+    var height=media.size.height;
     return Scaffold(
         appBar: AppBar(
           backgroundColor: themeColor1,
@@ -490,545 +359,739 @@ class _EditShopScreenState extends State<EditShopScreen> {
           ),
         ),
         body: SingleChildScrollView(
-            child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                        color: themeColor1,
-                        borderRadius: BorderRadius.circular(5)),
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
-                    child: Center(
-                        child: Text(
-                      "Verified",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    )),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                        color: themeColor1,
-                        borderRadius: BorderRadius.circular(5)),
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
-                    child: Center(
-                        child: Text(
-                      "Unverified",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    )),
-                  )
-                ],
-              ),
-              Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    DividerWithTextWidget(text: "Shop"),
-                    UploadImages(
-                      title: "Shop Street",
-                      onCamera: () => getImage(ImageSource.camera,"street"),
-                      onGallery: () => getImage(ImageSource.gallery,"street"),
-                    ),
-                    InkWell(
-                        onLongPress: (){
-                          setState(() {
-                            loading1=false;
-                            image1=null;
-                          });
-                        },
-                        child: VisiableImage(loading: loading1, image: image1)),
-                    UploadImages(
-                      title: "Shop Front",
-                      onCamera: () => getImage(ImageSource.camera,"front"),
-                      onGallery: () => getImage(ImageSource.gallery,"front"),
-                    ),
-                    InkWell(
-                        onLongPress: (){
-                          setState(() {
-                            loading2=false;
-                            image2=null;
-                          });
-                        },
-                        child: VisiableImage(loading: loading2, image: image2)),
-                    UploadImages(
-                      title: "Shop Internal",
-                      onCamera: () => getImage(ImageSource.camera,"internal"),
-                      onGallery: () => getImage(ImageSource.gallery,"internal"),
-                    ),
-                    InkWell(
-                        onLongPress: (){
-                          setState(() {
-                            loading3=false;
-                            image3=null;
-                          });
-                        },
-                        child: VisiableImage(loading: loading3, image: image3)),
-                    UploadImages(
-                      title: "Shop Sign Board",
-                      onCamera: () => getImage(ImageSource.camera,"signboard"),
-                      onGallery: () => getImage(ImageSource.gallery,"signboard"),
-                    ),
-                    InkWell(
-                        onLongPress: (){
-                          setState(() {
-                            loading4=false;
-                            image4=null;
-                          });
-                        },
-                        child: VisiableImage(loading: loading4, image: image4)),
-                    DividerWithTextWidget(text: "Owner"),
-                    UploadImages(
-                      title: "Owner",
-                      onCamera: () => getImage(ImageSource.camera,"owner"),
-                      onGallery: () => getImage(ImageSource.gallery,"owner"),
-                    ),
-                    InkWell(
-                        onLongPress: (){
-                          setState(() {
-                            loading=false;
-                            image=null;
-                          });
-                        },
-                        child: VisiableImage(loading: loading, image: image)),
-                    UploadImages(
-                      title: "CNIC Front",
-                      onCamera: () => getImage(ImageSource.camera,"cinc_front"),
-                      onGallery: () => getImage(ImageSource.gallery,"cinc_front"),
-                    ),
-                    InkWell(
-                        onLongPress: (){
-                          setState(() {
-                            loading5=false;
-                            image5=null;
-                          });
-                        },
-                        child: VisiableImage(loading: loading5, image: image5)),
-                    UploadImages(
-                      title: "CNIC Back",
-                      onCamera: () => getImage(ImageSource.camera,"cnic_back"),
-                      onGallery: () => getImage(ImageSource.gallery,"cnic_back"),
-                    ),
-                    InkWell(
-                        onLongPress: (){
-                          setState(() {
-                            loading6=false;
-                            image6=null;
-                          });
-                        },
-                        child: VisiableImage(loading: loading6, image: image6)),
-
-                    // UploadImageCard(
-                    //   title: "Owner",
-                    //   onCamera:()=> getImage(ImageSource.camera),
-                    //   onGallery: ()=> getImage(ImageSource.gallery),
-                    // ),
-                    /* UploadImageCard(
-                      title: "Shop Street",
-                      onCamera:()=> getImage(ImageSource.camera),
-                      onGallery: ()=> getImage(ImageSource.gallery),
-                    ),
-                    UploadImageCard(
-                      title: "Shop Front",
-                      onCamera:()=> getImage(ImageSource.camera),
-                      onGallery: ()=> getImage(ImageSource.gallery),
-                    ),
-                    UploadImageCard(
-                      title: "Shop Internal",
-                      onCamera:()=> getImage(ImageSource.camera),
-                      onGallery: ()=> getImage(ImageSource.gallery),
-                    ),
-                    UploadImageCard(
-                      title: "Shop Sign Board",
-                      onCamera:()=> getImage(ImageSource.camera),
-                      onGallery: ()=> getImage(ImageSource.gallery),
-                    ),
-                    UploadImageCard(
-                      title: "CINC Front",
-                      onCamera:()=> getImage(ImageSource.camera),
-                      onGallery: ()=> getImage(ImageSource.gallery),
-                    ),
-                    UploadImageCard(
-                      title: "CNIC Back",
-                      onCamera:()=> getImage(ImageSource.camera),
-                      onGallery: ()=> getImage(ImageSource.gallery),
-                    ),
-                    UploadImageCard(
-                      title: "Person 2",
-                      onCamera:()=> getImage(ImageSource.camera),
-                      onGallery: ()=> getImage(ImageSource.gallery),
-                    ),
-                    UploadImageCard(
-                      title: "Person 3",
-                      onCamera:()=> getImage(ImageSource.camera),
-                      onGallery: ()=> getImage(ImageSource.gallery),
-                    ),
-                  ],
-                ),
-              ),*/   DividerWithTextWidget(text: "Customer"),
-                    EditTextField(
-                      label: "Customer Code",
-                      hintText: "00008",
-                      onChange: (value) {},
-                      controller: controller,
-                    ),
-                    EditTextField(
-                      label: "Customer Shop",
-                      hintText: "Hadi Autos",
-                      onChange: (value) {},
-                      controller: controller1,
-                    ),
-                    EditTextField(
-                      label: "Category",
-                      hintText: "1",
-                      onChange: (value) {},
-                      controller: controller2,
-                    ),
-              DividerWithTextWidget(text: "Owner"),
-
-          EditTextField(
-                      label: "Owner Name",
-                      hintText: "Sami Fahim,",
-                      onChange: (value) {},
-                      controller: controller3,
-                    ),
-                    EditTextField(
-                      label: "Owner Number",
-                      hintText: "+921234567890",
-                      onChange: (value) {},
-                      controller: controller4,
-                    ),
-                    EditTextField(
-                      label: "Owner CNIC",
-                      hintText: "42000 456987412",
-                      onChange: (value) {},
-                      controller: controller5,
-                    ),
-                    EditTextField(
-                      label: "CNIC EXPIRE DATE",
-                      hintText: "12-04-1998",
-                      onChange: (value) {},
-                      controller: controller6,
-                    ),
-                    DividerWithTextWidget(text: "Address"),
-                    EditTextField(
-                      label: "Customer Address",
-                      hintText: "Pakistan Sindh Karachi",
-                      onChange: (value) {},
-                      controller: controller7,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      child: Text(
-                        "Country",
-                        style: TextStyle(color: themeColor1),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: themeColor1)),
-                      child: DropdownButton(
-                        isDense: true,
-                        underline: Container(),
-                        isExpanded: true,
-                        value: firstCountry,
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        items: country.map((String items) {
-                          return DropdownMenuItem(
-                            value: items,
-                            child: Text(items),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            firstCountry = newValue!;
-                          });
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      child: Text(
-                        "Province",
-                        style: TextStyle(color: themeColor1),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: themeColor1)),
-                      child: DropdownButton(
-                        isDense: true,
-                        underline: Container(),
-                        isExpanded: true,
-                        value: firstCity,
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        items: city.map((String items) {
-                          return DropdownMenuItem(
-                            value: items,
-                            child: Text(items),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            firstCity = newValue!;
-                          });
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      child: Text(
-                        "City",
-                        style: TextStyle(color: themeColor1),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: themeColor1)),
-                      child: DropdownButton(
-                        isDense: true,
-                        underline: Container(),
-                        isExpanded: true,
-                        value: firstCity,
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        items: city.map((String items) {
-                          return DropdownMenuItem(
-                            value: items,
-                            child: Text(items),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            firstCity = newValue!;
-                          });
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      child: Text(
-                        "Area",
-                        style: TextStyle(color: themeColor1),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: themeColor1)),
-                      child: DropdownButton(
-                        isDense: true,
-                        underline: Container(),
-                        isExpanded: true,
-                        value: firstCity,
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        items: city.map((String items) {
-                          return DropdownMenuItem(
-                            value: items,
-                            child: Text(items),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            firstCity = newValue!;
-                          });
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      child: Text(
-                        "Market",
-                        style: TextStyle(color: themeColor1),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 0, horizontal: 0),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 10),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                border: Border.all(color: themeColor1)),
-                            child: DropdownButton(
-                              isDense: true,
-                              underline: Container(),
-                              isExpanded: true,
-                              value: firstCity,
-                              icon: const Icon(Icons.keyboard_arrow_down),
-                              items: city.map((String items) {
-                                return DropdownMenuItem(
-                                  value: items,
-                                  child: Text(items),
-                                );
-                              }).toList(),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  firstCity = newValue!;
-                                });
-                              },
+            child: Stack(
+              children: [
+                isLoading?Container(
+                    color: Colors.white.withOpacity(0.5),
+                    width: width,
+                    height: height* 0.87,
+                    alignment: Alignment.center,
+                    child: Loading()):Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      VerifiedButton(onVerify: (){},onUnVerify: (){},),
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              child: Column(children: [
+                                DividerWithTextWidget(text: "Shop"),
+                                UploadImages(
+                                  title: "Shop Street",
+                                  onCamera: () => getImage(ImageSource.camera,"street"),
+                                  onGallery: () => getImage(ImageSource.gallery,"street"),
+                                ),
+                                InkWell(
+                                    onLongPress: (){
+                                      setState(() {
+                                        loading1=false;
+                                        image1=null;
+                                      });
+                                    },
+                                    child: VisiableImage(loading: loading1, image: image1)),
+                                UploadImages(
+                                  title: "Shop Front",
+                                  onCamera: () => getImage(ImageSource.camera,"front"),
+                                  onGallery: () => getImage(ImageSource.gallery,"front"),
+                                ),
+                                InkWell(
+                                    onLongPress: (){
+                                      setState(() {
+                                        loading2=false;
+                                        image2=null;
+                                      });
+                                    },
+                                    child: VisiableImage(loading: loading2, image: image2)),
+                                UploadImages(
+                                  title: "Shop Internal",
+                                  onCamera: () => getImage(ImageSource.camera,"internal"),
+                                  onGallery: () => getImage(ImageSource.gallery,"internal"),
+                                ),
+                                InkWell(
+                                    onLongPress: (){
+                                      setState(() {
+                                        loading3=false;
+                                        image3=null;
+                                      });
+                                    },
+                                    child: VisiableImage(loading: loading3, image: image3)),
+                                UploadImages(
+                                  title: "Shop Sign Board",
+                                  onCamera: () => getImage(ImageSource.camera,"signboard"),
+                                  onGallery: () => getImage(ImageSource.gallery,"signboard"),
+                                ),
+                                InkWell(
+                                    onLongPress: (){
+                                      setState(() {
+                                        loading4=false;
+                                        image4=null;
+                                      });
+                                    },
+                                    child: VisiableImage(loading: loading4, image: image4)),
+                                DividerWithTextWidget(text: "Owner"),
+                                UploadImages(
+                                  title: "Owner",
+                                  onCamera: () => getImage(ImageSource.camera,"owner"),
+                                  onGallery: () => getImage(ImageSource.gallery,"owner"),
+                                ),
+                                InkWell(
+                                    onLongPress: (){
+                                      setState(() {
+                                        loading=false;
+                                        image=null;
+                                      });
+                                    },
+                                    child: VisiableImage(loading: loading, image: image)),
+                                UploadImages(
+                                  title: "CNIC Front",
+                                  onCamera: () => getImage(ImageSource.camera,"cinc_front"),
+                                  onGallery: () => getImage(ImageSource.gallery,"cinc_front"),
+                                ),
+                                InkWell(
+                                    onLongPress: (){
+                                      setState(() {
+                                        loading5=false;
+                                        image5=null;
+                                      });
+                                    },
+                                    child: VisiableImage(loading: loading5, image: image5)),
+                                UploadImages(
+                                  title: "CNIC Back",
+                                  onCamera: () => getImage(ImageSource.camera,"cnic_back"),
+                                  onGallery: () => getImage(ImageSource.gallery,"cnic_back"),
+                                ),
+                                InkWell(
+                                    onLongPress: (){
+                                      setState(() {
+                                        loading6=false;
+                                        image6=null;
+                                      });
+                                    },
+                                    child: VisiableImage(loading: loading6, image: image6))
+                              ],),
                             ),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              visible = visible ? false : true;
-                            });
-                          },
-                          child: Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 10),
-                            decoration: BoxDecoration(
-                                color: themeColor1,
-                                borderRadius: BorderRadius.circular(5)),
-                            padding: EdgeInsets.symmetric(
-                                vertical: 15, horizontal: 20),
-                            child: Center(
-                                child: Text(
-                              "Add Market",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 15),
-                            )),
-                          ),
-                        )
-                      ],
-                    ),
-                    Visibility(
-                      visible: visible,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Flexible(
-                              child: EditTextField(
-                            label: "Type Market Name",
-                            hintText: "Market Name",
-                            onChange: (value) {},
-                            controller: controller8,
-                          )),
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                visible = visible ? false : true;
-                              });
-                            },
-                            child: Container(
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 10),
+                            DividerWithTextWidget(text: "Customer"),
+                            EditTextField(
+                              label: "Customer Code",
+                              hintText: widget.customer.custOldCode.toString(),
+                              onChange: (value) {
+                              print(customerCode.text);
+                                },
+                              controller: customerCode,
+                            ),
+                            EditTextField(
+                              label: "Customer Shop",
+                              hintText: widget.customer.userData!.firstName,
+                              onChange: (value) {},
+                              controller: shopName,
+                            ),
+                            EditTextField(
+                              label: "Category",
+                              hintText: widget.customer.custOldCode,
+                              onChange: (value) {},
+                              controller: category,
+                            ),
+                            DividerWithTextWidget(text: "Owner"),
+
+                            EditTextField(
+                              label: "Owner Name",
+                              hintText: widget.customer.custPrimName,
+                              onChange: (value) {},
+                              controller: ownerName,
+                            ),
+                            EditTextField(
+                              label: "Owner Number",
+                              hintText: widget.customer.custPrimNb,
+                              onChange: (value) {},
+                              controller: ownerNo,
+                            ),
+                            EditTextField(
+                              label: "Owner CNIC",
+                              hintText: widget.customer.cnic,
+                              onChange: (value) {
+
+                              },
+                              controller: ownerCNIC,
+                            ),
+                            EditTextField(
+                              label: "CNIC EXPIRE DATE",
+                              hintText: widget.customer.cnicExp,
+                              onChange: (value) {},
+                              controller: expireDateCNIC,
+                            ),
+                            DividerWithTextWidget(text: "Address"),
+                            EditTextField(
+                              label: "Customer Address",
+                              hintText: widget.customer.custAddress,
+                              onChange: (value) {},
+                              controller: customerAddress,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              child: Text(
+                                "Country",
+                                style: TextStyle(color: themeColor1),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Color(0xffF4F4F4),
+                                  border: Border.all(color: themeColor1)
+                              ),
+                              height: height * 0.065,
+                              child: InputDecorator(
+                                  decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color:Color(0xffEEEEEE))
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.red)),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+
+                                    contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 5,right: 10),
+                                  ),
+
+                                  child:
+                                  DropdownButtonHideUnderline(
+                                      child: DropdownButton<CountryModel>(
+                                          icon:Icon(Icons.arrow_drop_down),
+                                          hint: Padding(
+
+                                            padding: const EdgeInsets.only(left:8.0),
+                                            child:
+                                            Text("Select your Country", style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w400,
+                                                color: Color(
+                                                  0xffB2B2B2,
+                                                ))),
+                                          ),
+                                          value: countryValue,
+                                          isExpanded: true,
+                                          onTap: (){
+
+                                          },
+                                          onChanged: (country) async {
+                                            setState(() {
+                                              countryValue=country!;
+
+                                              //print("Selected area is: "+sel_areas.areaCode.toString());
+                                            });
+                                            getCountry();
+                                            setState(() {
+
+                                            });
+
+
+                                          },
+                                          style: TextStyle(fontSize: 14,
+                                              color: Color(0xffC5C5C5, )),
+                                          items:
+                                          countries.map<DropdownMenuItem<CountryModel>>((CountryModel item) {
+                                            return DropdownMenuItem<CountryModel>(
+                                              value: item,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left:8.0),
+                                                child: VariableText(
+                                                  text: item.name??'Not Found',
+                                                  fontsize: 13,
+                                                  weight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList()
+                                      ))),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              child: Text(
+                                "Province",
+                                style: TextStyle(color: themeColor1),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Color(0xffF4F4F4),
+                                  border: Border.all(color: themeColor1)
+                              ),
+                              height: height * 0.065,
+                              child: InputDecorator(
+                                  decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color:Color(0xffEEEEEE))
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.red)),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+
+                                    contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 5,right: 10),
+                                  ),
+
+                                  child:
+                                  DropdownButtonHideUnderline(
+                                      child: DropdownButton<ProvincesModel>(
+                                          icon:Icon(Icons.arrow_drop_down),
+                                          hint: Padding(
+
+                                            padding: const EdgeInsets.only(left:8.0),
+                                            child:
+                                            Text("Select your Province", style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w400,
+                                                color: Color(
+                                                  0xffB2B2B2,
+                                                ))),
+                                          ),
+                                          value: stateValue,
+                                          isExpanded: true,
+                                          onTap: (){
+
+                                          },
+                                          onChanged: (state) async {
+                                            setState(() {
+                                              stateValue=state!;
+
+                                              //print("Selected area is: "+sel_areas.areaCode.toString());
+                                            });
+                                            getCity(stateValue.id.toString());
+
+
+                                          },
+                                          style: TextStyle(fontSize: 14,
+                                              color: Color(0xffC5C5C5, )),
+                                          items:
+                                          sates.map<DropdownMenuItem<ProvincesModel>>((ProvincesModel item) {
+                                            return DropdownMenuItem<ProvincesModel>(
+                                              value: item,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left:8.0),
+                                                child: VariableText(
+                                                  text: item.name??'Not Found',
+                                                  fontsize: 13,
+                                                  weight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList()
+                                      ))),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              child: Text(
+                                "City",
+                                style: TextStyle(color: themeColor1),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Color(0xffF4F4F4),
+                                  border: Border.all(color: themeColor1)
+                              ),
+                              height: height * 0.065,
+                              child: InputDecorator(
+                                  decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color:Color(0xffEEEEEE))
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.red)),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+
+                                    contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 5,right: 10),
+                                  ),
+
+                                  child:
+                                  DropdownButtonHideUnderline(
+                                      child: DropdownButton<CityModel>(
+                                          icon:Icon(Icons.arrow_drop_down),
+                                          hint: Padding(
+
+                                            padding: const EdgeInsets.only(left:8.0),
+                                            child:
+                                            Text("Select your Province", style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w400,
+                                                color: Color(
+                                                  0xffB2B2B2,
+                                                ))),
+                                          ),
+                                          value: cityValue,
+                                          isExpanded: true,
+                                          onTap: (){
+
+                                          },
+                                          onChanged: (city) async {
+                                            setState(() {
+                                              cityValue=city!;
+                                              getArea(cityValue.id.toString());
+
+                                              //print("Selected area is: "+sel_areas.areaCode.toString());
+                                            });
+
+
+                                          },
+                                          style: TextStyle(fontSize: 14,
+                                              color: Color(0xffC5C5C5, )),
+                                          items:
+                                          cities.map<DropdownMenuItem<CityModel>>((CityModel item) {
+                                            return DropdownMenuItem<CityModel>(
+                                              value: item,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left:8.0),
+                                                child: VariableText(
+                                                  text: item.name??'Not Found',
+                                                  fontsize: 13,
+                                                  weight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList()
+                                      ))),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              child: Text(
+                                "Area",
+                                style: TextStyle(color: themeColor1),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Color(0xffF4F4F4),
+                                  border: Border.all(color: themeColor1)
+                              ),
+                              height: height * 0.065,
+                              child: InputDecorator(
+                                  decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color:Color(0xffEEEEEE))
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.red)),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+
+                                    contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 5,right: 10),
+                                  ),
+
+                                  child:
+                                  DropdownButtonHideUnderline(
+                                      child: DropdownButton<AreaModel>(
+                                          icon:Icon(Icons.arrow_drop_down),
+                                          hint: Padding(
+
+                                            padding: const EdgeInsets.only(left:8.0),
+                                            child:
+                                            Text("Select your Province", style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w400,
+                                                color: Color(
+                                                  0xffB2B2B2,
+                                                ))),
+                                          ),
+                                          value: areaValue,
+                                          isExpanded: true,
+                                          onTap: (){
+
+                                          },
+                                          onChanged: (area) async {
+                                            setState(() {
+                                              areaValue=area!;
+                                              getMarket(areaValue.id.toString());
+
+                                              //print("Selected area is: "+sel_areas.areaCode.toString());
+                                            });
+
+
+                                          },
+                                          style: TextStyle(fontSize: 14,
+                                              color: Color(0xffC5C5C5, )),
+                                          items:
+                                          areas.map<DropdownMenuItem<AreaModel>>((AreaModel item) {
+                                            return DropdownMenuItem<AreaModel>(
+                                              value: item,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left:8.0),
+                                                child: VariableText(
+                                                  text: item.name??'Not Found',
+                                                  fontsize: 13,
+                                                  weight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList()
+                                      ))),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              child: Text(
+                                "Market",
+                                style: TextStyle(color: themeColor1),
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: Color(0xffF4F4F4),
+                                        border: Border.all(color: themeColor1)
+                                    ),
+                                    height: height * 0.065,
+                                    child: InputDecorator(
+                                        decoration: InputDecoration(
+                                          enabledBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(color:Color(0xffEEEEEE))
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(color: Colors.red)),
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+
+                                          contentPadding: EdgeInsets.only(top: 0, bottom: 0, left: 5,right: 10),
+                                        ),
+
+                                        child:
+                                        DropdownButtonHideUnderline(
+                                            child: DropdownButton<MarketModel>(
+                                                icon:Icon(Icons.arrow_drop_down),
+                                                hint: Padding(
+
+                                                  padding: const EdgeInsets.only(left:8.0),
+                                                  child:
+                                                  Text("Select your market", style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w400,
+                                                      color: Color(
+                                                        0xffB2B2B2,
+                                                      ))),
+                                                ),
+                                                value: marketValue,
+                                                isExpanded: true,
+                                                onTap: (){
+
+                                                },
+                                                onChanged: (market) async {
+                                                  setState(() {
+                                                    marketValue=market!;
+
+                                                    //print("Selected area is: "+sel_areas.areaCode.toString());
+                                                  });
+
+
+                                                },
+                                                style: TextStyle(fontSize: 14,
+                                                    color: Color(0xffC5C5C5, )),
+                                                items:
+                                                markets.map<DropdownMenuItem<MarketModel>>((MarketModel item) {
+                                                  return DropdownMenuItem<MarketModel>(
+                                                    value: item,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(left:8.0),
+                                                      child: VariableText(
+                                                        text: item.name??'Not Found',
+                                                        fontsize: 13,
+                                                        weight: FontWeight.w400,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList()
+                                            ))),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: (){
+                                    setState(() {
+                                      visible = visible ? false : true;
+                                    });
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 10),
+                                    decoration: BoxDecoration(
+                                        color: themeColor1,
+                                        borderRadius: BorderRadius.circular(5)),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 20),
+                                    child: Center(
+                                        child: Text(
+                                          "Add Market",
+                                          style:
+                                          TextStyle(color: Colors.white, fontSize: 15),
+                                        )),
+                                  ),
+                                )
+                              ],
+                            ),
+                            Visibility(
+                              visible: visible,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Flexible(
+                                      child: EditTextField(
+                                        label: "Type Market Name",
+                                        hintText: "Market Name",
+                                        onChange: (value) {},
+                                        controller: marketsController,
+                                      )),
+                                  InkWell(
+                                    onTap: (){
+
+                                      getMarketList(marketsController.text, areaValue.id!.toInt());
+                                      marketsController.clear();
+                                      },
+                                      child: Container(
+                                      margin: EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                      color: themeColor1,
+                                      borderRadius: BorderRadius.circular(5)),
+                                      padding: EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 20),
+                                      child: Center(
+                                      child: Text(
+                                      "ADD",
+                                      style: TextStyle(
+                                      color: Colors.white, fontSize: 15),
+                                      )),
+                                      ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            DividerWithTextWidget(text: "Second Contact person"),
+                            UploadImages(
+                              title: "Second Person",
+                              onCamera: () => getImage(ImageSource.camera,"person_1"),
+                              onGallery: () => getImage(ImageSource.gallery,"person_1"),
+                            ),
+                            InkWell(
+                                onLongPress: (){
+                                  setState(() {
+                                    loading7=false;
+                                    image7=null;
+                                  });
+                                },
+                                child: VisiableImage(loading: loading7, image: image7)),
+                            EditTextField(
+                              label: "Second Contact Person Name",
+                              hintText: widget.customer.contactPerson2,
+                              onChange: (value) {},
+                              controller: person2,
+                            ),
+                            EditTextField(
+                              label: "Second Contact person Number",
+                              hintText:widget.customer.phone2,
+                              onChange: (value) {},
+                              controller: phoneNo2,
+                            ),
+                            DividerWithTextWidget(text: "Third Contact person"),
+                            UploadImages(
+                              title: "Thrid person",
+                              onCamera: () => getImage(ImageSource.camera,"person_2"),
+                              onGallery: () => getImage(ImageSource.gallery,"person_2"),
+                            ),
+                            InkWell(
+                                onLongPress: (){
+                                  setState(() {
+                                    loading8=false;
+                                    image8=null;
+                                  });
+                                },
+                                child: VisiableImage(loading: loading8, image: image8)),
+                            EditTextField(
+                              label: "Third Contact Person Name",
+                              hintText: widget.customer.contactPerson3,
+                              onChange: (value) {},
+                              controller: person3,
+                            ),
+                            EditTextField(
+                              label: "ThirdContact person Number",
+                              hintText: widget.customer.phone3,
+                              onChange: (value) {},
+                              controller: phoneNo3,
+                            ),
+                            SizedBox(height: 10,),
+                            Container(
+                              margin: EdgeInsets.symmetric(vertical: 10),
                               decoration: BoxDecoration(
                                   color: themeColor1,
                                   borderRadius: BorderRadius.circular(5)),
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 15, horizontal: 20),
+                              padding:
+                              EdgeInsets.symmetric(vertical: 10, horizontal: 30),
                               child: Center(
                                   child: Text(
-                                "ADD",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 15),
-                              )),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    DividerWithTextWidget(text: "Second Contact person"),
-                    UploadImages(
-                      title: "Second Person",
-                      onCamera: () => getImage(ImageSource.camera,"person_1"),
-                      onGallery: () => getImage(ImageSource.gallery,"person_1"),
-                    ),
-                    InkWell(
-                        onLongPress: (){
-                          setState(() {
-                            loading7=false;
-                            image7=null;
-                          });
-                        },
-                        child: VisiableImage(loading: loading7, image: image7)),
-                    EditTextField(
-                      label: "Second Contact Person Name",
-                      hintText: "Altaf",
-                      onChange: (value) {},
-                      controller: controller9,
-                    ),
-                    EditTextField(
-                      label: "Second Contact person Number",
-                      hintText: "+92312345678",
-                      onChange: (value) {},
-                      controller: controller10,
-                    ),
-                    DividerWithTextWidget(text: "Third Contact person"),
-                    UploadImages(
-                      title: "Thrid person",
-                      onCamera: () => getImage(ImageSource.camera,"person_2"),
-                      onGallery: () => getImage(ImageSource.gallery,"person_2"),
-                    ),
-                    InkWell(
-                        onLongPress: (){
-                          setState(() {
-                            loading8=false;
-                            image8=null;
-                          });
-                        },
-                        child: VisiableImage(loading: loading8, image: image8)),
-                    EditTextField(
-                      label: "Third Contact Person Name",
-                      hintText: "Altaf",
-                      onChange: (value) {},
-                      controller: controller11,
-                    ),
-                    EditTextField(
-                      label: "ThirdContact person Number",
-                      hintText: "+92312345678",
-                      onChange: (value) {},
-                      controller: controller12,
-                    ),
-                    SizedBox(height: 10,),
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                          color: themeColor1,
-                          borderRadius: BorderRadius.circular(5)),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                      child: Center(
-                          child: Text(
-                        "Save",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      )),
-                    )
-                  ],
-                ),
-              )
-            ],
+                                    "Save",
+                                    style: TextStyle(color: Colors.white, fontSize: 20),
+                                  )),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            )));
+  }
+}
+
+class VerifiedButton extends StatelessWidget {
+  VerifiedButton({this.onVerify,this.onUnVerify});
+  final onVerify;
+  final onUnVerify;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          InkWell(
+            onTap: onVerify,
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                  color: themeColor1,
+                  borderRadius: BorderRadius.circular(5)),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+              child: Center(
+                  child: Text(
+                    "Verified",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  )),
+            ),
           ),
-        )));
+          InkWell(
+            onTap: onUnVerify,
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                  color: themeColor1,
+                  borderRadius: BorderRadius.circular(5)),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+              child: Center(
+                  child: Text(
+                    "Unverified",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  )),
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
 
