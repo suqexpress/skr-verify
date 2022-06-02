@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:page_indicator/page_indicator.dart';
@@ -468,7 +469,9 @@ class _EditShopScreenState extends State<EditShopScreen> {
       }
     }
   }
-
+  getCountry(){
+    var dio=Dio();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

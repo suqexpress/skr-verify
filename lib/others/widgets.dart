@@ -10,19 +10,22 @@ class LoginTextField extends StatelessWidget {
       this.label,
       this.onchange,
       this.obscureText,
-      this.keyboardType});
+      this.keyboardType,
+      this.controller});
 
   final double width;
   final onchange;
   final label;
   final keyboardType;
   final obscureText;
+  final controller;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
       child: TextField(
+        controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
         onChanged: onchange,

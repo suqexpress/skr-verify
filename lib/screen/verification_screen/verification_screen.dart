@@ -1,11 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:provider/provider.dart';
+import 'package:salesmen_app/model/user_model.dart';
 import 'package:salesmen_app/others/style.dart';
 import 'package:salesmen_app/screen/main_screeen/mainScreen.dart';
 
 class VerificationScreen extends StatefulWidget {
-  const VerificationScreen({Key? key}) : super(key: key);
+  VerificationScreen({this.code,this.phoneNo,this.password});
+  final code;
+  final phoneNo;
+  final password;
 
   @override
   State<VerificationScreen> createState() => _VerificationScreenState();
@@ -14,6 +20,9 @@ class VerificationScreen extends StatefulWidget {
 class _VerificationScreenState extends State<VerificationScreen> {
   @override
   Widget build(BuildContext context) {
+    var data= Provider.of<UserModel>(context).token;
+    print("token $data");
+    print(widget.code);
     return Scaffold(
       backgroundColor: themeColor1.withOpacity(0.8),
       body: SingleChildScrollView(
@@ -33,7 +42,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 textStyle: TextStyle(color: themeColor1.withOpacity(0.8)),
                 autoDismissKeyboard: true,
                 enableActiveFill: true,
-                onCompleted: (value){
+                onCompleted: (value)async{
+                  var _credential = PhoneAuthProvider.credential(verificationId: widget.code, smsCode: value);
+                  print(_credential);
+                  print("Completed");
                   Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
                 },
                 cursorColor: themeColor1.withOpacity(0.8),
@@ -49,14 +61,17 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 selectedFillColor: Colors.white
               ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text("Resend Code?",style: GoogleFonts.archivo(fontSize: 18,color: Colors.white),),
-                  ),
-                ],
+              InkWell(
+                onTap: ()=>Navigator.pop(context),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Resend Code?",style: GoogleFonts.archivo(fontSize: 18,color: Colors.white),),
+                    ),
+                  ],
+                ),
               )
           ],),
         ),
