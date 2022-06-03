@@ -42,6 +42,7 @@ class CustomerModel {
   String? ntn;
   double? balance;
   UserData? userData;
+  ImageModel? imageModel;
   double distance=0;
 
   CustomerModel(
@@ -88,6 +89,7 @@ class CustomerModel {
         this.ntn,
         this.balance,
         this.userData,
+         this.imageModel,
         required this.distance});
 
   CustomerModel.fromJson(Map<String, dynamic> json,double distance) {
@@ -137,6 +139,9 @@ class CustomerModel {
     userData = json['user_data'] != null
         ? new UserData.fromJson(json['user_data'])
         : null;
+    imageModel = json['images'] != null
+        ? new ImageModel.fromJson(json['images'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -185,6 +190,9 @@ class CustomerModel {
     data['balance'] = this.balance;
     if (this.userData != null) {
       data['user_data'] = this.userData!.toJson();
+    }
+    if (this.imageModel != null) {
+      data['images'] = this.imageModel!.toJson();
     }
     return data;
   }
@@ -241,6 +249,70 @@ class UserData {
     data['is_active'] = this.isActive;
     data['app_login'] = this.appLogin;
     data['web_login'] = this.webLogin;
+    data['created_at'] = this.createdAt;
+    data['updated_at'] = this.updatedAt;
+    return data;
+  }
+}
+class ImageModel {
+  int? id;
+  int? customerId;
+  Null? owner;
+  Null? shopFront;
+  Null? shopInternal;
+  Null? shopSignBoard;
+  Null? shopStreet;
+  Null? person1;
+  Null? person2;
+  Null? cnicFront;
+  Null? cnicBack;
+  String? createdAt;
+  String? updatedAt;
+
+  ImageModel(
+      {this.id,
+        this.customerId,
+        this.owner,
+        this.shopFront,
+        this.shopInternal,
+        this.shopSignBoard,
+        this.shopStreet,
+        this.person1,
+        this.person2,
+        this.cnicFront,
+        this.cnicBack,
+        this.createdAt,
+        this.updatedAt});
+
+  ImageModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    customerId = json['customer_id'];
+    owner = json['owner'];
+    shopFront = json['shop_front'];
+    shopInternal = json['shop_internal'];
+    shopSignBoard = json['shop_sign_board'];
+    shopStreet = json['shop_street'];
+    person1 = json['person_1'];
+    person2 = json['person_2'];
+    cnicFront = json['cnic_front'];
+    cnicBack = json['cnic_back'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['customer_id'] = this.customerId;
+    data['owner'] = this.owner;
+    data['shop_front'] = this.shopFront;
+    data['shop_internal'] = this.shopInternal;
+    data['shop_sign_board'] = this.shopSignBoard;
+    data['shop_street'] = this.shopStreet;
+    data['person_1'] = this.person1;
+    data['person_2'] = this.person2;
+    data['cnic_front'] = this.cnicFront;
+    data['cnic_back'] = this.cnicBack;
     data['created_at'] = this.createdAt;
     data['updated_at'] = this.updatedAt;
     return data;

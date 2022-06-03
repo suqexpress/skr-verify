@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:salesmen_app/model/customerModel.dart';
 import 'package:salesmen_app/others/style.dart';
 import 'package:salesmen_app/others/widgets.dart';
 import 'package:location/location.dart' as loc;
 import 'package:salesmen_app/screen/login_screen/login_screen.dart';
+import 'package:salesmen_app/screen/main_screeen/search_screen.dart';
 import '../../search_field.dart';
 var f = NumberFormat("###,###.0#", "en_US");
 class MainScreen extends StatefulWidget {
@@ -26,8 +28,12 @@ class _MainScreenState extends State<MainScreen> {
   var actualAddress = "Searching....";
   late Coordinates userLatLng;
   List<CustomerModel> customer=[];
+  List<CustomerModel> _list=[];
+  List<CustomerModel> customersearchresult=[];
   bool loading=false;
+  TextEditingController search=TextEditingController();
   void onStart()async{
+    var locationPermission = await Permission.locationAlways.request();
     loc.Location location = new loc.Location();
     var _location = await location.getLocation();
     _serviceEnabled = true;
@@ -58,7 +64,9 @@ class _MainScreenState extends State<MainScreen> {
         customer.add(CustomerModel.fromJson(shop,dist));
         debugPrint("distsnce: ${dist.toString()} $i ${customer[i].id}");
         i++;
+
       }
+      _list=customer;
       setState(() {
          customer.sort((a, b) => a.distance.compareTo(b.distance));
        });
@@ -67,18 +75,41 @@ class _MainScreenState extends State<MainScreen> {
     }
     setLoading(false);
   }
+  bool _isSearching=false;
+  void searchOperation(String searchText) {
+    if (_isSearching != null) {
+      customersearchresult.clear();
+      for (int i = 0; i < _list.length; i++) {
+        String data = _list[i].userData!.firstName.toString();
+        String data1 = _list[i].custOldCode.toString();
+
+        if (data.toLowerCase().contains(searchText.toLowerCase())) {
+          print("search by name");
+          customersearchresult.addAll([_list[i]]);
+          setState(() {});
+        }else if(data1.toLowerCase().contains(searchText.toLowerCase())) {
+          print("search by code");
+          customersearchresult.addAll([_list[i]]);
+          setState(() {});
+        }
+      }
+      print("result is: " + customersearchresult.length.toString());
+    }
+  }
+
   @override
   void initState() {
     onStart();
     getCustomer();
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
+    bool _isSearching=false;
     var media = MediaQuery.of(context).size;
     double height = media.height;
     var width = media.width;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor:themeColor1,
@@ -135,9 +166,30 @@ class _MainScreenState extends State<MainScreen> {
               child: Loading()):Container(
             padding: EdgeInsets.symmetric(horizontal: 15),
             child: Column(children: [
-              SearchField(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  InkWell(
+                      onTap:()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchScreen(customerModel: customer, lat: 1.0, long: 1.0))),
+                      child: Container(
+                          width: width * 0.7,
+                          child: SearchField(enable: false,onTap: (){}))),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 1,horizontal: 5),
+                    decoration: BoxDecoration(
+                      color: themeColor1,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: IconButton(onPressed: (){
+                      onStart();
+                      getCustomer();
+                    },icon: Icon(Icons.refresh,color: Colors.white,),),),
+
+                ],
+              ),
               Container(
-                child: customer.length<1?Center(child:Text("No Shop Found")):ListView.builder(
+                child: customer.length<1?Center(child:Text("No Shop Found")):
+                ListView.builder(
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemCount: customer.length>10?10:customer.length,

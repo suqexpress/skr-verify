@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:salesmen_app/model/user_model.dart';
 import 'package:salesmen_app/others/style.dart';
 import 'package:salesmen_app/screen/main_screeen/mainScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class VerificationScreen extends StatefulWidget {
   VerificationScreen({this.code,this.phoneNo,this.password});
@@ -46,6 +47,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   var _credential = PhoneAuthProvider.credential(verificationId: widget.code, smsCode: value);
                   print(_credential);
                   print("Completed");
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  prefs.setString("phoneNo", widget.phoneNo);
+                  prefs.setString("password", widget.password);
                   Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
                 },
                 cursorColor: themeColor1.withOpacity(0.8),

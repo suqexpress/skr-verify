@@ -92,6 +92,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0+2"
+  draggable_scrollbar:
+    dependency: "direct main"
+    description:
+      name: draggable_scrollbar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0"
   fake_async:
     dependency: transitive
     description:
@@ -187,7 +194,7 @@ packages:
       name: flutter_plugin_android_lifecycle
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.6"
+    version: "1.0.11"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -274,21 +281,7 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.4"
-  image_picker_for_web:
-    dependency: transitive
-    description:
-      name: image_picker_for_web
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.8"
-  image_picker_platform_interface:
-    dependency: transitive
-    description:
-      name: image_picker_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.5.0"
+    version: "0.6.5+3"
   intl:
     dependency: "direct main"
     description:

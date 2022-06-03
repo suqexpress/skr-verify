@@ -32,7 +32,8 @@ dependencies:
   loading_animation_widget: ^1.1.0+5
   pin_code_fields: ^7.4.0
   intl: ^0.17.0
-  image_picker: 0.8.4
+  draggable_scrollbar: ^0.1.0
+  image_picker: ^0.6.0+9
   page_indicator: ^0.4.1
   dotted_border: ^2.0.0+2
   permission_handler: 6.0.0
@@ -50,6 +51,8 @@ dependencies:
   geocoder: 0.2.1
   location: ^4.3.0
   geolocator: ^7.1.1
+
+
 
 dev_dependencies:
   flutter_test:
