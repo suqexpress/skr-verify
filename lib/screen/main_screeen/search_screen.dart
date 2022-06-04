@@ -1,13 +1,14 @@
 import 'package:draggable_scrollbar/draggable_scrollbar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:salesmen_app/model/customerListModel.dart';
 import 'package:salesmen_app/model/customerModel.dart';
 import 'package:salesmen_app/others/style.dart';
 import 'package:salesmen_app/others/widgets.dart';
 import 'package:salesmen_app/search_field.dart';
 
 class SearchScreen extends StatefulWidget {
-  List<CustomerModel> customerModel;
+  List<CustomerListModel> customerModel;
   double lat, long;
   SearchScreen({required this.customerModel, required this.lat, required this.long});
   @override
@@ -29,54 +30,21 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   int i = 0;
-  List<CustomerModel> _list = [];
-  List<CustomerModel> customersearchresult = [];
+  List<CustomerListModel> _list = [];
+  List<CustomerListModel> customersearchresult = [];
   Future getAllCustomerData() async {
     for (var item in widget.customerModel) {
       if (i < widget.customerModel.length) {
-        _list.add(CustomerModel(
+        _list.add(CustomerListModel(
             id:widget.customerModel[i].id,
-            custRegDate:widget.customerModel[i].custRegDate,
-            custStatus:widget.customerModel[i].custStatus,
-            custEditable:widget.customerModel[i].custEditable,
-            custParentCheck:widget.customerModel[i].custParentCheck,
-            custCode:widget.customerModel[i].custCode,
-            custName:widget.customerModel[i].custName,
-            custOldCode:widget.customerModel[i].custOldCode,
-            custPrimNb:widget.customerModel[i].custPrimNb,
-            custPrimName:widget.customerModel[i].custPrimName,
-            custPrimPass:widget.customerModel[i].custPrimPass,
-            custPrimApp:widget.customerModel[i].custPrimApp,
-            custAddress:widget.customerModel[i].custAddress,
-            cnic:widget.customerModel[i].cnic,
-            countryId:widget.customerModel[i].countryId,
-            provId:widget.customerModel[i].provId,
-            cityId:widget.customerModel[i].cityId,
-            areaId:widget.customerModel[i].areaId,
-            marketId:widget.customerModel[i].marketId,
-            custcatId:widget.customerModel[i].custcatId,
-            custclassId:widget.customerModel[i].custclassId,
-            custMinCredit:widget.customerModel[i].custMinCredit,
-            custMaxCredit:widget.customerModel[i].custMaxCredit,
-            custCreditCheck:widget.customerModel[i].custCreditCheck,
-            parentId:widget.customerModel[i].parentId, warehouseCode:widget.customerModel[i].warehouseCode,
-            addedBy:widget.customerModel[i].addedBy,
-            contactPerson2:widget.customerModel[i].contactPerson2,
-            phone2:widget.customerModel[i].phone2,
-            contactPerson3:widget.customerModel[i].contactPerson3,
-            phone3:widget.customerModel[i].phone3,
-            cnicExp:widget.customerModel[i].cnicExp,
-            lat:widget.customerModel[i].lat,
-            long:widget.customerModel[i].long,
-            paymentTerm:widget.customerModel[i].paymentTerm,
-            salemanName:widget.customerModel[i].salemanName,
-            cr30Days:widget.customerModel[i].cr30Days,
-            cr90Days:widget.customerModel[i].cr90Days,
-            cr180Days:widget.customerModel[i].cr180Days,
-            ntn:widget.customerModel[i].ntn,
-            balance:widget.customerModel[i].balance,
-            userData:widget.customerModel[i].userData,
-            distance:widget.customerModel[i].distance
+            custName: widget.customerModel[i].custName,
+          custAddress: widget.customerModel[i].custAddress,
+          custPrimNb: widget.customerModel[i].custPrimNb,
+          distance: widget.customerModel[i].distance,
+          verified: widget.customerModel[i].verified,
+          lat: widget.customerModel[i].lat,
+          long: widget.customerModel[i].long,
+          salemanName: widget.customerModel[i].salemanName,
         ));
 
         i++;
@@ -145,16 +113,17 @@ class _SearchScreenState extends State<SearchScreen> {
                             itemBuilder:(context,index){
                               return Container(
                                 padding: EdgeInsets.symmetric(horizontal: 10),
-                                child: CustomerCard(
+                                child:
+                                CustomerCard(
                                   height: height,
                                   width: width,
                                   f: f,
                                   menuButton: menuButton,
-                                  code: customersearchresult[index].custOldCode,
-                                  category: customersearchresult[index].custOldCode,
-                                  shopName: customersearchresult[index].userData!.firstName,
+                                  code: customersearchresult[index].id,
+                                  category: customersearchresult[index].id,
+                                  shopName: customersearchresult[index].custName,
                                   address:customersearchresult[index].custAddress,
-                                  name: customersearchresult[index].custPrimName,
+                                  name: customersearchresult[index].custName,
                                   phoneNo: customersearchresult[index].custPrimNb,
                                   lastVisit: "--",
                                   dues: "--",
@@ -186,8 +155,8 @@ class _SearchScreenState extends State<SearchScreen> {
     if (_isSearching != null) {
       customersearchresult.clear();
       for (int i = 0; i < _list.length; i++) {
-        String data = _list[i].userData!.firstName.toString();
-        String data1 = _list[i].custOldCode.toString();
+        String data = _list[i].custName.toString();
+        String data1 = _list[i].id.toString();
 
         if (data.toLowerCase().contains(searchText.toLowerCase())) {
           print("search by name");

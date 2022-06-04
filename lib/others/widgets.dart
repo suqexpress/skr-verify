@@ -264,7 +264,7 @@ class _CustomerCardState extends State<CustomerCard> {
               Padding(
                 padding: EdgeInsets.only(top: 4.0),
                 child: VariableText(
-                  text: widget.name,
+                  text: widget.name.toString().length>14?widget.name.toString().substring(0,14):widget.name.toString(),
                   // text: widget
                   //     .customerData.customerContactPersonName
                   //     .toString(),

@@ -7,8 +7,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:salesmen_app/model/AreaModel.dart';
+import 'package:salesmen_app/model/categoryModel.dart';
 import 'package:salesmen_app/model/cityModel.dart';
 import 'package:salesmen_app/model/countryModel.dart';
+import 'package:salesmen_app/model/customerListModel.dart';
 import 'package:salesmen_app/model/customerModel.dart';
 import 'package:salesmen_app/model/marketModel.dart';
 import 'package:salesmen_app/model/provincesModel.dart';
@@ -20,7 +22,7 @@ import 'package:salesmen_app/screen/main_screeen/mainScreen.dart';
 
 class EditShopScreen extends StatefulWidget {
   EditShopScreen({required this.customer});
-  CustomerModel customer;
+  CustomerListModel customer;
   @override
   State<EditShopScreen> createState() => _EditShopScreenState();
 }
@@ -31,6 +33,19 @@ class _EditShopScreenState extends State<EditShopScreen> {
   String firstCountry = 'Pakistan';
   bool isLoading = false;
   bool visible = false;
+  String? customerCodeText,
+      shopNameText,
+      categoryText,
+      ownerNameText,
+      ownerNoText,
+      ownerCNICText,
+      expireDateCNICText,
+      customerAddressText,
+      person2Text,
+      phoneNo2Text,
+      person3Text,
+      phoneNo3Text,
+      marketsControllerText;
   var customerCode,
       shopName,
       category,
@@ -61,81 +76,82 @@ class _EditShopScreenState extends State<EditShopScreen> {
   List<CityModel> cities = [];
   List<AreaModel> areas = [];
   List<MarketModel> markets = [];
+  List<CategoryModel> categories = [];
   CountryModel countryValue = CountryModel();
   ProvincesModel stateValue = ProvincesModel();
   CityModel cityValue = CityModel();
   AreaModel areaValue = AreaModel();
+  CategoryModel categoryValue = CategoryModel();
   MarketModel marketValue = MarketModel();
+  CustomerModel person =CustomerModel(distance: 0);
 
 
+  getCategory()async{
+    setLoading(true);
+    var dio = Dio();
+    var response = await dio.get("https://erp.suqexpress.com/api/customercategory");
+    for (var category in response.data['data']) {
+      categories.add(CategoryModel.fromJson(category));
+    }
+    for( var category in categories){
+      if(person.custcatId==category.id){
+        categoryValue = category;
+        setState(() {});
+      }
+    }
+    setLoading(false);
+  }
   postData() async {
     setLoading(true);
     var dio = Dio();
     String url = "https://erp.suqexpress.com/api/customer/edit/${widget.customer
-        .custOldCode}";
+        .id}";
     FormData formData = new FormData.fromMap({
-      "cust_old_code": customerCode == null
-          ? widget.customer.custOldCode
-          : customerCode.text,
-      "first_name": shopName == null
-          ? widget.customer.userData!.firstName
-          : shopName.text,
-      "custcat_id": category == null ? widget.customer.custcatId : category
-          .text,
-      "cust_prim_name": ownerName == null
-          ? widget.customer.custPrimName
-          : ownerName.text,
-      "cust_prim_name": ownerNo == null ? widget.customer.custPrimName : ownerNo
-          .text,
-      "cnic": ownerCNIC == null ? widget.customer.cnic : ownerCNIC.text,
-      "cnic_exp": expireDateCNIC == null
-          ? widget.customer.cnicExp
-          : expireDateCNIC.text,
-      "cust_address": customerAddress == null
-          ? widget.customer.custAddress
-          : customerAddress.text,
-      "country_id": widget.customer.countryId == countryValue.id ? widget
-          .customer.countryId : countryValue.id,
-      "prov_id": widget.customer.provId == stateValue.id ? widget.customer
+      "cust_old_code": customerCodeText==null?customerCode.text:customerCodeText,
+      "first_name": shopNameText==null? shopName.text:shopNameText,
+      "custcat_id": person.custcatId==categoryValue.id?category.text:categoryText,
+      "cust_prim_name" :ownerNameText==null?ownerName.text:ownerNameText,
+      "cust_prim_name":  ownerNameText==null? ownerNo.text:ownerNameText,
+      "cnic":ownerCNICText==null? ownerCNIC.text:ownerCNICText,
+      "cnic_exp": expireDateCNICText==null? expireDateCNIC.text:expireDateCNICText,
+      "cust_address": customerAddressText==null?customerAddress.text:customerAddressText,
+      "country_id":person.countryId == countryValue.id ? person.countryId : countryValue.id,
+      "prov_id":person.provId == stateValue.id ? person
           .provId : stateValue.id,
-      "city_id": widget.customer.cityId == cityValue.id
-          ? widget.customer.cityId
+      "city_id": person.cityId == cityValue.id
+          ?person.cityId
           : cityValue.id,
-      "area_id": widget.customer.areaId == areaValue.id
-          ? widget.customer.areaId
+      "area_id": person.areaId == areaValue.id
+          ? person.areaId
           : areaValue.id,
-      "market_id": widget.customer.marketId == marketValue.id ? widget.customer
+      "market_id": person.marketId == marketValue.id ?person
           .marketId : marketValue.id,
-      "contact_person2": person2 == null
-          ? widget.customer.contactPerson2
-          : person2.text,
-      "phone2": phoneNo2 == null ? widget.customer.phone2 : phoneNo2.text,
-      "contact_person3": person3 == null
-          ? widget.customer.contactPerson3
-          : person3.text,
-      "phone3": phoneNo3 == null ? widget.customer.phone3 : phoneNo3.text,
+      "contact_person2": person2Text==null? person2.text:person2Text,
+      "phone2": phoneNo2Text==null?phoneNo2.text:person2Text,
+      "contact_person3": person3Text==null? person3.text:person3Text,
+      "phone3":phoneNo3Text==null? phoneNo3.text:phoneNo3Text,
       //images
       "owner": ownerImage == null
-          ? widget.customer.imageModel!.owner
+          ? person.imageModel!.owner
           : ownerImage,
-      "shop_front": shopFrontImage == null ? widget.customer.imageModel!
+      "shop_front": shopFrontImage == null ? person.imageModel!
           .shopFront : shopFrontImage,
-      "shop_internal": shopInternalImage == null ? widget.customer.imageModel!
+      "shop_internal": shopInternalImage == null ? person.imageModel!
           .shopInternal : shopInternalImage,
-      "shop_sign_board": shopSignBoardImage == null ? widget.customer
+      "shop_sign_board": shopSignBoardImage == null ? person
           .imageModel!.shopSignBoard : shopSignBoardImage,
-      "shop_street": shopStreetImage == null ? widget.customer.imageModel!
+      "shop_street": shopStreetImage == null ? person.imageModel!
           .shopStreet : shopStreetImage,
-      "person_1": secondPersonImage == null ? widget.customer.imageModel!
+      "person_1": secondPersonImage == null ?person.imageModel!
           .person1 : secondPersonImage,
       "person_2": thirdPersonImage == null
-          ? widget.customer.imageModel!.person2
+          ?person.imageModel!.person2
           : thirdPersonImage,
       "cnic_front": cincImage == null
-          ? widget.customer.imageModel!.cnicFront
+          ? person.imageModel!.cnicFront
           : cincImage,
       "cnic_back": cnicback == null
-          ? widget.customer.imageModel!.cnicBack
+          ? person.imageModel!.cnicBack
           : cnicback,
     });
     print(widget.customer.id);
@@ -335,8 +351,15 @@ class _EditShopScreenState extends State<EditShopScreen> {
     for (var country in response.data['data']) {
       countries.add(CountryModel.fromJson(country));
     }
-    countryValue = countries[0];
-    getState(countries[0].id.toString());
+    for( var country in countries){
+      if(country.id==person.countryId){
+        countryValue = country;
+        setState(() {});
+        getState(countryValue.id.toString());
+        break;
+      }
+
+    }
   }
 
   getState(String countryId) async {
@@ -348,8 +371,14 @@ class _EditShopScreenState extends State<EditShopScreen> {
     for (var state in response1.data['data']) {
       sates.add(ProvincesModel.fromJson(state));
     }
-    stateValue = sates[0];
-    getCity(sates[0].id.toString());
+    for( var province in sates){
+      if(province.id==person.provId){
+        stateValue = province;
+        setState(() {});
+        getCity(province.id.toString());
+        break;
+      }
+    }
   }
 
   getCity(String id) async {
@@ -360,8 +389,14 @@ class _EditShopScreenState extends State<EditShopScreen> {
     for (var city in response2.data['data']) {
       cities.add(CityModel.fromJson(city));
     }
-    cityValue = cities[0];
-    getArea(cities[0].id.toString());
+    for( var city in cities){
+      if(city.id==person.cityId){
+        cityValue = city;
+        setState(() {});
+        getArea(city.id.toString());
+      break;
+      }
+    }
   }
 
   getArea(String id) async {
@@ -372,8 +407,23 @@ class _EditShopScreenState extends State<EditShopScreen> {
     for (var area in response3.data['data']) {
       areas.add(AreaModel.fromJson(area));
     }
-    areaValue = areas[0];
-    getMarket(areas[0].id.toString());
+    if(person.areaId!=null){
+      for (var area in areas) {
+        if (area.id==person.areaId) {
+          areaValue = area;
+          setState(() {});
+          getMarket(area.id.toString());
+          break;
+        }
+      }
+    }else{
+      areas.add(AreaModel(id:1 ,name:"Please select the Area", cityId:2 ,createdAt:"211212" ,updatedAt:"121212" ,deletedAt: "212"),);
+      setState(() {
+        areaValue=areas.last;
+      });
+      getMarket(1.toString());
+    }
+    setLoading(false);
   }
 
   getMarket(String id) async {
@@ -385,7 +435,20 @@ class _EditShopScreenState extends State<EditShopScreen> {
       for (var market in response4.data['data']) {
         markets.add(MarketModel.fromJson(market));
       }
-      marketValue = markets[0];
+      if(person.marketId!=null){
+        for (var market in markets) {
+          if (market.id == person.marketId) {
+            marketValue = market;
+            setState(() {});
+          }
+        }
+      }
+      else{
+        markets.add(MarketModel(id: 1,name: "select market",createdAt: "  ",updatedAt: " ",deletedAt: ""));
+        marketValue = markets.last;
+        setState(() {
+        });
+      }
     }
     setLoading(false);
   }
@@ -396,9 +459,54 @@ class _EditShopScreenState extends State<EditShopScreen> {
     });
   }
 
+  getCustomer()async{
+    setLoading(true);
+    var dio=Dio();
+    print(widget.customer.id);
+    var response=await dio.get("http://erp.suqexpress.com/api/customer/${widget.customer.id}") .then((value) {
+        print(value);
+        person=CustomerModel.fromJson(value.data["data"], widget.customer.distance);
+        customerCode=TextEditingController(text: person.custOldCode.toString());
+        shopName=TextEditingController(text: person.userData!.firstName);
+        category=TextEditingController(text:person.custcatId.toString());
+        ownerName=TextEditingController(text: person.custPrimName.toString());
+        ownerNo=TextEditingController(text: person.custPrimNb.toString());
+        ownerCNIC=TextEditingController(text: person.cnic.toString());
+        expireDateCNIC=TextEditingController(text: person.cnicExp.toString());
+        customerAddress=TextEditingController(text: person.custAddress.toString());
+        person2=TextEditingController(text: person.contactPerson2.toString());
+        person3=TextEditingController(text: person.contactPerson3.toString());
+        phoneNo2=TextEditingController(text: person.phone2.toString());
+        phoneNo3=TextEditingController(text: person.phone3.toString());
+        marketsController=TextEditingController(text: person.marketId.toString());
+
+      }).catchError((e)=> Alert(
+      context: context,
+      type: AlertType.error,
+      title: "Apis,Not response",
+      desc: "error message: $e",
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Cancel",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          width: 120,
+        )
+      ],
+    ).show());
+    setLoading(false);
+  }
+
   @override
   void initState() {
-    getCountry();
+    onStart();
+    getCustomer();
+    getCategory();
+    getCountry();  
     super.initState();
   }
 
@@ -470,7 +578,8 @@ class _EditShopScreenState extends State<EditShopScreen> {
     return Scaffold(
         appBar: Appbar(context),
         body: SingleChildScrollView(
-            child: Stack(
+            child:
+            Stack(
               children: [
                 isLoading
                     ? Container(
@@ -593,59 +702,124 @@ class _EditShopScreenState extends State<EditShopScreen> {
                             DividerWithTextWidget(text: "Customer"),
                             EditTextField(
                               label: "Customer Code",
-                              hintText: widget.customer.custOldCode.toString(),
+                              hintText: customerCode.text,
                               onChange: (value) {
-                                customerCode = TextEditingController(text: value);
-                                print(customerCode.text);
+                                customerCodeText = value;
+                                setState(() {});
+
                               },
                               controller: customerCode,
                             ),
                             EditTextField(
                               label: "Customer Shop",
-                              hintText: widget.customer.userData!.firstName,
+                              hintText: shopName.text,
                               onChange: (value) {
-                                shopName = TextEditingController(text: value);
+                                shopNameText = value;
+                                setState(() {});
+
                               },
                               controller: shopName,
                             ),
-                            EditTextField(
+                            TextFieldLabel(
                               label: "Category",
-                              hintText: widget.customer.custOldCode,
-                              onChange: (value) {
-                                category = TextEditingController(text: value);
-                              },
-                              controller: category,
                             ),
+                          Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: Color(0xffF4F4F4),
+                                border: Border.all(color: themeColor1)),
+                            height: height * 0.065,
+                            child: InputDecorator(
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Color(0xffEEEEEE))),
+                                  focusedBorder:
+                                  OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+                                  border:
+                                  OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+                                  contentPadding:
+                                  EdgeInsets.only(top: 0, bottom: 0, left: 5, right: 10),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<CategoryModel>(
+                                        icon: Icon(Icons.arrow_drop_down),
+                                        hint: Padding(
+                                          padding: const EdgeInsets.only(left: 8.0),
+                                          child: Text("Select your Category",
+                                              style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Color(
+                                                    0xffB2B2B2,
+                                                  ))),
+                                        ),
+                                        value: categoryValue,
+                                        isExpanded: true,
+                                        onTap: () {},
+                                        onChanged: (category) async {
+                                          setState(() {
+                                            categoryValue = category!;
+                                            //print("Selected area is: "+sel_areas.areaCode.toString());
+                                          });
+                                        },
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Color(
+                                              0xffC5C5C5,
+                                            )),
+                                        items:
+                                        categories.map<DropdownMenuItem<CategoryModel>>((CategoryModel item) {
+                                          return DropdownMenuItem<CategoryModel>(
+                                            value: item,
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(left: 8.0),
+                                              child: VariableText(
+                                                text: item.catName ?? 'Not Found',
+                                                fontsize: 13,
+                                                weight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList()))),
+                          ),
                             DividerWithTextWidget(text: "Owner"),
                             EditTextField(
                               label: "Owner Name",
-                              hintText: widget.customer.custPrimName,
+                              hintText: ownerName.text,
                               onChange: (value) {
-                                ownerName = TextEditingController(text: value);
+                                ownerNameText = value;
+                                setState(() {});
+
                               },
                               controller: ownerName,
                             ),
                             EditTextField(
                               label: "Owner Number",
-                              hintText: widget.customer.custPrimNb,
+                              hintText: ownerNo.text,
                               onChange: (value) {
-                                ownerNo = TextEditingController(text: value);
+                                ownerNoText =  value;
+                                setState(() {});
+
                               },
                               controller: ownerNo,
                             ),
                             EditTextField(
                               label: "Owner CNIC",
-                              hintText: widget.customer.cnic,
+                              hintText: ownerCNIC.text,
                               onChange: (value) {
-                                ownerCNIC = TextEditingController(text: value);
+                                ownerCNICText =  value;
+                                setState(() {});
+
                               },
                               controller: ownerCNIC,
                             ),
                             EditTextField(
                               label: "CNIC EXPIRE DATE",
-                              hintText: widget.customer.cnicExp,
+                              hintText: expireDateCNIC.text,
                               onChange: (value) {
-                                expireDateCNIC = TextEditingController(text: value);
+                                expireDateCNICText =  value;
+                                setState(() {});
+
                               },
                               controller: expireDateCNIC,
                             ),
@@ -658,10 +832,10 @@ class _EditShopScreenState extends State<EditShopScreen> {
                                   width: width * 0.7,
                                   child: EditTextField(
                                     label: "Customer Address",
-                                    hintText: widget.customer.custAddress,
+                                    hintText: customerAddress.text,
                                     onChange: (value) {
-                                      customerAddress = TextEditingController(text: value);
-                                      widget.customer.custAddress=value;
+
+
                                       setState(() {
 
                                       });
@@ -676,7 +850,8 @@ class _EditShopScreenState extends State<EditShopScreen> {
                                     borderRadius: BorderRadius.circular(5),
                                   ),
                                   child: IconButton(onPressed: (){
-                                  customerAddress = TextEditingController(text: actualAddress);
+                                    customerAddress=TextEditingController(text: actualAddress);
+                                  setState(() {});
                                 },icon: Icon(Icons.location_searching,color: Colors.white,),),),
                               ],
                             ),
@@ -722,14 +897,22 @@ class _EditShopScreenState extends State<EditShopScreen> {
                                     image: secondPersonImage)),
                             EditTextField(
                               label: "Second Contact Person Name",
-                              hintText: widget.customer.contactPerson2,
-                              onChange: (value) {},
+                              hintText: person2.text,
+                              onChange: (value) {
+                                person2Text=value;
+                                setState(() {});
+
+                              },
                               controller: person2,
                             ),
                             EditTextField(
                               label: "Second Contact person Number",
-                              hintText: widget.customer.phone2,
-                              onChange: (value) {},
+                              hintText: phoneNo2.text,
+                              onChange: (value) {
+                                phoneNo2Text=value;
+                                setState(() {});
+
+                              },
                               controller: phoneNo2,
                             ),
                             DividerWithTextWidget(
@@ -753,14 +936,21 @@ class _EditShopScreenState extends State<EditShopScreen> {
                                     image: thirdPersonImage)),
                             EditTextField(
                               label: "Third Contact Person Name",
-                              hintText: widget.customer.contactPerson3,
-                              onChange: (value) {},
+                              hintText:person3.text,
+                              onChange: (value) {
+                                person2Text=value;
+                                setState(() {});
+
+                              },
                               controller: person3,
                             ),
                             EditTextField(
                               label: "ThirdContact person Number",
-                              hintText: widget.customer.phone3,
-                              onChange: (value) {},
+                              hintText: phoneNo2.text,
+                              onChange: (value) {
+                                phoneNo3=value;
+                                setState(() {});
+                              },
                               controller: phoneNo3,
                             ),
                             SizedBox(
@@ -779,7 +969,8 @@ class _EditShopScreenState extends State<EditShopScreen> {
                   ),
                 )
               ],
-            )));
+            )
+        ));
   }
 
   AppBar Appbar(BuildContext context) {

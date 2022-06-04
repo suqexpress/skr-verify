@@ -1,11 +1,12 @@
 import 'dart:convert';
-import 'dart:math' show cos, sqrt, asin;
+import 'dart:math' show acos, sin,cos,pi;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:salesmen_app/model/customerListModel.dart';
 import 'package:salesmen_app/model/customerModel.dart';
 import 'package:salesmen_app/others/style.dart';
 import 'package:salesmen_app/others/widgets.dart';
@@ -27,9 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   bool _serviceEnabled = false;
   var actualAddress = "Searching....";
   late Coordinates userLatLng;
-  List<CustomerModel> customer=[];
-  List<CustomerModel> _list=[];
-  List<CustomerModel> customersearchresult=[];
+  List<CustomerListModel> customer=[];
   bool loading=false;
   TextEditingController search=TextEditingController();
   void onStart()async{
@@ -50,51 +49,54 @@ class _MainScreenState extends State<MainScreen> {
       loading=value;
     });
   }
+  String distance(
+      double lat1, double lon1, double lat2, double lon2, String unit) {
+    double theta = lon1 - lon2;
+    double dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) +
+        cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(deg2rad(theta));
+    dist = acos(dist);
+    dist = rad2deg(dist);
+    dist = dist * 60 * 1.1515;
+    if (unit == 'K') {
+      dist = dist * 1.609344;
+    } else if (unit == 'N') {
+      dist = dist * 0.8684;
+    }
+    return dist.toStringAsFixed(2);
+  }
+
+  double deg2rad(double deg) {
+    return (deg * pi / 180.0);
+  }
+
+  double rad2deg(double rad) {
+    return (rad * 180.0 / pi);
+  }
   getCustomer()async{
     setLoading(true);
     var dio = Dio();
-    var response= await dio.get("https://erp.suqexpress.com/api/customer").catchError((e)=>print("error: $e"));
+    var response= await dio.get("https://erp.suqexpress.com/api/listcustomers").catchError((e)=>print("error: $e"));
     if (response.statusCode==200){
       // var data=jsonDecode(response.toString());
       debugPrint("get customer success");
       int i=0;
-      for (var shop in response.data){
+      for (var shop in response.data["data"]){
         double dist= Geolocator.distanceBetween(userLatLng.latitude, userLatLng.longitude, double.parse(shop['lat'].toString()=="null"?1.toString():shop['lat'].toString()),double.parse(shop['long'].toString()=="null"?1.toString():shop['long'].toString()));
         //calculateDistance(userLatLng.latitude, userLatLng.longitude, double.parse(shop['lat']), double.parse(shop['long'].toString()));
-        customer.add(CustomerModel.fromJson(shop,dist));
+        customer.add(CustomerListModel.fromJson(shop,dist.toDouble()));
         debugPrint("distsnce: ${dist.toString()} $i ${customer[i].id}");
         i++;
 
       }
-      _list=customer;
       setState(() {
          customer.sort((a, b) => a.distance.compareTo(b.distance));
        });
+
     }else{
       setLoading(false);
+
     }
     setLoading(false);
-  }
-  bool _isSearching=false;
-  void searchOperation(String searchText) {
-    if (_isSearching != null) {
-      customersearchresult.clear();
-      for (int i = 0; i < _list.length; i++) {
-        String data = _list[i].userData!.firstName.toString();
-        String data1 = _list[i].custOldCode.toString();
-
-        if (data.toLowerCase().contains(searchText.toLowerCase())) {
-          print("search by name");
-          customersearchresult.addAll([_list[i]]);
-          setState(() {});
-        }else if(data1.toLowerCase().contains(searchText.toLowerCase())) {
-          print("search by code");
-          customersearchresult.addAll([_list[i]]);
-          setState(() {});
-        }
-      }
-      print("result is: " + customersearchresult.length.toString());
-    }
   }
 
   @override
@@ -192,18 +194,31 @@ class _MainScreenState extends State<MainScreen> {
                 ListView.builder(
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
+
                     itemCount: customer.length>10?10:customer.length,
                     itemBuilder:(context,index){
-                      return CustomerCard(
+                      return
+                        /*ListTile(
+                        title: Text(customer[index].custName.toString(),style: TextStyle(fontSize: 14),),
+                        subtitle: Text(customer[index].custPrimNb.toString()),
+                        trailing: Text(customer[index].distance.toStringAsFixed(2)),
+                        leading: CircleAvatar(
+                          radius: 30,
+                          backgroundColor: customer[index].verified==0?Colors.grey:themeColor1,
+                          child: Text("V",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.bold),),
+                        ),
+                      );*/
+
+                        CustomerCard(
                         height: height,
                         width: width,
                         f: f,
                         menuButton: menuButton,
-                        code: customer[index].custOldCode,
-                        category: customer[index].custOldCode,
-                        shopName: customer[index].userData!.firstName,
+                        code: customer[index].id,
+                        category: customer[index].id,
+                        shopName: customer[index].custName,
                         address:customer[index].custAddress,
-                        name: customer[index].custPrimName,
+                        name: customer[index].custName,
                         phoneNo: customer[index].custPrimNb,
                         lastVisit: "--",
                         dues: "--",
