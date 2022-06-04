@@ -10,7 +10,7 @@ import 'package:salesmen_app/model/customerListModel.dart';
 import 'package:salesmen_app/model/customerModel.dart';
 import 'package:salesmen_app/others/style.dart';
 import 'package:salesmen_app/others/widgets.dart';
-import 'package:location/location.dart' as loc;
+import 'package:location/location.dart';
 import 'package:salesmen_app/screen/login_screen/login_screen.dart';
 import 'package:salesmen_app/screen/main_screeen/search_screen.dart';
 import '../../search_field.dart';
@@ -32,7 +32,44 @@ class _MainScreenState extends State<MainScreen> {
   bool loading=false;
   TextEditingController search=TextEditingController();
   void onStart()async{
-    var locationPermission = await Permission.locationAlways.request();
+    _serviceEnabled = await Permission.location.isGranted;
+    print("location permission: " + _serviceEnabled.toString());
+    if (!_serviceEnabled) {
+      var locationPermission = await Permission.location.request();
+      print("permission ${locationPermission}");
+      if (locationPermission.isGranted) {
+        bool temp = await serviceEnabled();
+        if (!temp) {
+          bool _locationService = await ;
+          // location.hasPermission(locationPermission.);
+          if (!_locationService) {
+            print('denied');
+            Fluttertoast.showToast(
+                msg: "Please turn on location",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3,
+                backgroundColor: Colors.black87,
+                textColor: Colors.white,
+                fontSize: 16.0);
+            return;
+          }
+        } else {
+          print("already enabled");
+        }
+      } else {
+        print('denied');
+        Fluttertoast.showToast(
+            msg: "Please give location permission",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 3,
+            backgroundColor: Colors.black87,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        return;
+      }
+    }
     loc.Location location = new loc.Location();
     var _location = await location.getLocation();
     _serviceEnabled = true;

@@ -72,7 +72,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
       loading7 = false,
       loading8 = false;
   List<CountryModel> countries = [];
-  List<ProvincesModel> sates = [];
+  List<ProvincesModel> states = [];
   List<CityModel> cities = [];
   List<AreaModel> areas = [];
   List<MarketModel> markets = [];
@@ -351,33 +351,47 @@ class _EditShopScreenState extends State<EditShopScreen> {
     for (var country in response.data['data']) {
       countries.add(CountryModel.fromJson(country));
     }
-    for( var country in countries){
-      if(country.id==person.countryId){
-        countryValue = country;
-        setState(() {});
-        getState(countryValue.id.toString());
-        break;
-      }
+    if(person.countryId!=null){
+      for( var country in countries){
+        if(country.id==person.countryId){
+          countryValue = country;
+          setState(() {});
+          getState(countryValue.id.toString());
+          break;
+        }
 
+      }
+    }else{
+      countries.add(CountryModel(id: 1,name:"please select the country",updatedAt: "",deletedAt: "",createdAt: ""));
+      countryValue=countries.last;
+      setState(() {});
+      getState(1.toString());
     }
   }
 
   getState(String countryId) async {
     setLoading(true);
-    sates.clear();
+    states.clear();
     var dio = Dio();
     var response1 =
     await dio.get("https://erp.suqexpress.com/api/state/$countryId}");
     for (var state in response1.data['data']) {
-      sates.add(ProvincesModel.fromJson(state));
+      states.add(ProvincesModel.fromJson(state));
     }
-    for( var province in sates){
-      if(province.id==person.provId){
-        stateValue = province;
-        setState(() {});
-        getCity(province.id.toString());
-        break;
+    if(person.provId!=null){
+      for( var province in states){
+        if(province.id==person.provId){
+          stateValue = province;
+          setState(() {});
+          getCity(province.id.toString());
+          break;
+        }
       }
+    }else{
+      states.add(ProvincesModel(id: 1,name: "please select the province",updatedAt: "",createdAt: "",deletedAt: ""));
+      stateValue=states.last;
+      setState(() {});
+      getCity(1.toString());
     }
   }
 
@@ -389,13 +403,20 @@ class _EditShopScreenState extends State<EditShopScreen> {
     for (var city in response2.data['data']) {
       cities.add(CityModel.fromJson(city));
     }
-    for( var city in cities){
-      if(city.id==person.cityId){
-        cityValue = city;
-        setState(() {});
-        getArea(city.id.toString());
-      break;
+    if(person.cityId!=null){
+      for( var city in cities){
+        if(city.id==person.cityId){
+          cityValue = city;
+          setState(() {});
+          getArea(city.id.toString());
+          break;
+        }
       }
+    }else{
+      cities.add(CityModel(id: 1,name: "please select the city",updatedAt: "",createdAt: "",deletedAt: ""));
+      cityValue=cities.last;
+      setState(() {});
+      getArea(1.toString());
     }
   }
 
@@ -1292,7 +1313,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
                       color: Color(
                         0xffC5C5C5,
                       )),
-                  items: sates.map<DropdownMenuItem<ProvincesModel>>(
+                  items: states.map<DropdownMenuItem<ProvincesModel>>(
                           (ProvincesModel item) {
                         return DropdownMenuItem<ProvincesModel>(
                           value: item,
