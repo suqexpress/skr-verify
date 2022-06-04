@@ -33,7 +33,7 @@ dependencies:
   pin_code_fields: ^7.4.0
   intl: ^0.17.0
   draggable_scrollbar: ^0.1.0
-  image_picker: ^0.6.0+9
+  image_picker: 0.6.0+9
   page_indicator: ^0.4.1
   dotted_border: ^2.0.0+2
   permission_handler: 6.0.0

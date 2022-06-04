@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math' show acos, sin,cos,pi;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
@@ -10,7 +11,7 @@ import 'package:salesmen_app/model/customerListModel.dart';
 import 'package:salesmen_app/model/customerModel.dart';
 import 'package:salesmen_app/others/style.dart';
 import 'package:salesmen_app/others/widgets.dart';
-import 'package:location/location.dart';
+import 'package:location/location.dart' as loc;
 import 'package:salesmen_app/screen/login_screen/login_screen.dart';
 import 'package:salesmen_app/screen/main_screeen/search_screen.dart';
 import '../../search_field.dart';
@@ -27,21 +28,25 @@ class _MainScreenState extends State<MainScreen> {
   bool isLoading=true;
   bool _serviceEnabled = false;
   var actualAddress = "Searching....";
-  late Coordinates userLatLng;
+  Coordinates userLatLng=Coordinates(1, 1);
   List<CustomerListModel> customer=[];
   bool loading=false;
   TextEditingController search=TextEditingController();
+
+
+
   void onStart()async{
     _serviceEnabled = await Permission.location.isGranted;
+    loc.Location location= await loc.Location();
     print("location permission: " + _serviceEnabled.toString());
     if (!_serviceEnabled) {
       var locationPermission = await Permission.location.request();
       print("permission ${locationPermission}");
       if (locationPermission.isGranted) {
-        bool temp = await serviceEnabled();
+        bool temp = await location.serviceEnabled();
         if (!temp) {
-          bool _locationService = await ;
-          // location.hasPermission(locationPermission.);
+          var resquest = await location.requestPermission();
+          bool _locationService=await location.serviceEnabled();          // location.hasPermission(locationPermission.);
           if (!_locationService) {
             print('denied');
             Fluttertoast.showToast(
@@ -70,7 +75,6 @@ class _MainScreenState extends State<MainScreen> {
         return;
       }
     }
-    loc.Location location = new loc.Location();
     var _location = await location.getLocation();
     _serviceEnabled = true;
     actualAddress = "Searching....";

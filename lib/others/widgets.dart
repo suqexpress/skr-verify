@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -674,3 +676,371 @@ class EditTextField extends StatelessWidget {
     );
   }
 }
+class ShowDropDown extends StatelessWidget {
+  const ShowDropDown({
+    Key? key,
+    required this.height,
+    required this.value,
+    required this.list,
+    required this.onChange,
+  }) : super(key: key);
+
+  final double height;
+  final  value;
+  final List list;
+  final void Function(dynamic)? onChange;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Color(0xffF4F4F4),
+          border: Border.all(color: themeColor1)),
+      height: height * 0.065,
+      child: InputDecorator(
+          decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Color(0xffEEEEEE))),
+            focusedBorder:
+            OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+            border:
+            OutlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+            contentPadding:
+            EdgeInsets.only(top: 0, bottom: 0, left: 5, right: 10),
+          ),
+          child: DropdownButtonHideUnderline(
+              child: DropdownButton<dynamic>(
+                  icon: Icon(Icons.arrow_drop_down),
+                  hint: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text("Select your Category",
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: Color(
+                              0xffB2B2B2,
+                            ))),
+                  ),
+                  value: value,
+                  isExpanded: true,
+                  onChanged: onChange,
+                  // onTap: () {},
+                  // onChanged: (category) async {
+                  //   setState(() {
+                  //     categoryValue = category!;
+                  //     //print("Selected area is: "+sel_areas.areaCode.toString());
+                  //   });
+                  // },
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: Color(
+                        0xffC5C5C5,
+                      )),
+                  items:
+                  list.map<DropdownMenuItem<dynamic>>((dynamic item) {
+                    return DropdownMenuItem<dynamic>(
+                      value: item,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: VariableText(
+                          text: item.catName ?? 'Not Found',
+                          fontsize: 13,
+                          weight: FontWeight.w400,
+                        ),
+                      ),
+                    );
+                  }).toList()))),
+    );
+  }
+}
+
+
+class TextFieldLabel extends StatelessWidget {
+  TextFieldLabel({this.label});
+  final label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      child: Text(
+        label,
+        style: TextStyle(color: themeColor1),
+      ),
+    );
+  }
+}
+
+class SaveButton extends StatelessWidget {
+  SaveButton({this.onSave});
+  final onSave;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: InkWell(
+        onTap: onSave,
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+              color: themeColor1, borderRadius: BorderRadius.circular(5)),
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+          child: Center(
+              child: Text(
+                "Save",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              )),
+        ),
+      ),
+    );
+  }
+}
+
+class VerifiedButtons extends StatelessWidget {
+  VerifiedButtons({this.onVerify, this.onUnVerify});
+  final onVerify;
+  final onUnVerify;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          InkWell(
+            onTap: onVerify,
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                  color: themeColor1, borderRadius: BorderRadius.circular(5)),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+              child: Center(
+                  child: Text(
+                    "Verified",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  )),
+            ),
+          ),
+          InkWell(
+            onTap: onUnVerify,
+            child: Container(
+              margin: EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                  color: themeColor1, borderRadius: BorderRadius.circular(5)),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+              child: Center(
+                  child: Text(
+                    "Unverified",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  )),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class VisiableImage extends StatefulWidget {
+  VisiableImage({
+    Key? key,
+    required this.loading,
+    required this.image,
+  }) : super(key: key);
+
+  var loading = false;
+  File? image;
+
+  @override
+  _VisiableImageState createState() => _VisiableImageState();
+}
+
+class _VisiableImageState extends State<VisiableImage> {
+  @override
+  Widget build(BuildContext context) {
+    return Visibility(
+      visible: widget.loading,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(5),
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 10),
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: widget.loading
+              ? Image.file(
+            File(widget.image!.path),
+            fit: BoxFit.fill,
+          )
+              : Container(),
+        ),
+      ),
+    );
+  }
+}
+
+class UploadImages extends StatelessWidget {
+  UploadImages({this.title, this.onCamera, this.onGallery});
+  final title;
+  final onCamera;
+  final onGallery;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              child: Text(
+                title,
+                style: TextStyle(color: themeColor1, fontSize: 18),
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              InkWell(
+                onTap: onCamera,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.camera,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              InkWell(
+                onTap: onGallery,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.photo,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class DividerWithTextWidget extends StatelessWidget {
+  final String text;
+  DividerWithTextWidget({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    final line = Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            margin: EdgeInsets.only(
+              left: 10,
+              right: 10,
+            ),
+            child: Divider(height: 20, thickness: 1),
+          ),
+        ));
+
+    return Row(children: [line, Text(this.text), line]);
+  }
+}
+
+class LocationButton extends StatelessWidget {
+  const LocationButton({
+    Key? key,
+    required this.width,
+    required this.customerAddress,
+    required this.onPressed,
+  }) : super(key: key);
+
+  final double width;
+  final TextEditingController customerAddress;
+  final void Function()? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            width: width * 0.7,
+            child: EditTextField(
+              label: "Customer Address",
+              hintText: customerAddress.text,
+              // onChange: (value) {},
+              controller: customerAddress,
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.symmetric(vertical: 5,horizontal: 0),
+            decoration: BoxDecoration(
+              color: themeColor1,
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: IconButton(onPressed: onPressed
+              //   customerAddress=TextEditingController(text: actualAddress);
+              // setState(() {});
+              ,icon: Icon(Icons.location_searching,color: Colors.white,),),),
+        ],
+      ),
+    );
+  }
+}
+
+class ImageContainer extends StatelessWidget {
+  const ImageContainer({
+    Key? key,
+    required this.loading1,
+    required this.shopStreetImage,
+    required this.onLongPress,
+    required this.onGallery,
+    required this.onCamera,
+    required this.title,
+  }) : super(key: key);
+
+  final bool loading1;
+  final File? shopStreetImage;
+  final void Function()? onLongPress;
+  final  Function onCamera;
+  final  Function onGallery;
+  final  String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(child: Column(
+      children: [
+        UploadImages(
+          title: title,
+          onCamera: onCamera,
+          onGallery: onGallery,
+        ),
+        InkWell(
+            onLongPress:onLongPress ,
+            child: VisiableImage(loading: loading1, image: shopStreetImage)),
+      ],
+    ),);
+  }
+}
+
