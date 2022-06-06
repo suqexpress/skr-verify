@@ -31,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
   getLogin(context)async{
     setLoading(true);
-    print("+92"+password.text.substring(1));
+    print("+92"+phoneNo.text.substring(1));
     print(password.text);
     var response=await Auth.getLogin(phoneNo:"+92"+phoneNo.text.substring(1), password:password.text,onSuccess: (response)async{
       if(response.statusCode==200){
@@ -81,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
             } ,
             codeSent: ( verificationId, [forceResendingToken]) async {
               setLoading(false);
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>VerificationScreen(code: verificationId,phoneNo:"+92"+password.text.substring(1) ,password: password.text,)));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>VerificationScreen(code: verificationId,phoneNo:"+92"+phoneNo.text.substring(1) ,password: password.text,)));
             }
         );
         // Navigator.push(context, MaterialPageRoute(builder: (context)=>VerificationCodeScreen(verificationCode: "123",phoneNo: widget.phoneNumber,password: _passController.text,)));

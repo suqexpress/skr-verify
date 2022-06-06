@@ -61,21 +61,23 @@ class _EditShopScreenState extends State<EditShopScreen> {
       phoneNo2,
       person3,
       phoneNo3,
-      marketsController = TextEditingController();
+      marketsController,
+      remarks,
+      assignAmmount= TextEditingController();
 
   File? ownerImage, shopStreetImage, shopFrontImage, shopInternalImage,
-      shopSignBoardImage, cincImage, cnicback, secondPersonImage,
+      shopSignBoardImage, cincFrontImage, cnicBackImage, secondPersonImage,
       thirdPersonImage;
 
-  bool loading = false,
-      loading1 = false,
-      loading2 = false,
-      loading3 = false,
-      loading4 = false,
-      loading5 = false,
-      loading6 = false,
-      loading7 = false,
-      loading8 = false;
+  bool ownerVisible = false,
+      shopStreetVisible = false,
+      shopFrontVisible = false,
+      shopInternalVisible = false,
+      shopSignBoardVisible = false,
+      cnicFrontVisible = false,
+      cnicbackVisible = false,
+      personTwoVisiable = false,
+      personThreeVisible = false;
 
   List<CountryModel> countries = [];
   List<ProvincesModel> states = [];
@@ -108,7 +110,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
     setState(() {});
   }
 
-  getImage(ImageSource source,bool visible,File? image) async {
+  getImage(ImageSource source,String image) async {
     var camera = await Permission.camera.request();
     var gallery = await Permission.storage.request();
     final File pickedFile = await ImagePicker.pickImage(
@@ -116,12 +118,81 @@ class _EditShopScreenState extends State<EditShopScreen> {
       maxWidth: 512,
       maxHeight: 512,
     );
-    if (pickedFile != null) {
-      setState(() {
-        image = pickedFile;
-        visible = true;
-        print(image!.path);
-      });
+    switch(image) {
+      case "owner":
+        if (pickedFile != null) {
+          ownerImage = pickedFile;
+          ownerVisible = true;
+          print(ownerImage!.path);
+          setState(() {
+          });
+        }
+        break;
+      case  "cnic_front":
+        if (pickedFile != null) {
+          cincFrontImage = pickedFile;
+          cnicFrontVisible = true;
+          print(cincFrontImage!.path);
+          setState(() {
+          });
+        }
+        break;
+      case "cnic_back":
+        if (pickedFile != null) {
+          cnicBackImage = pickedFile;
+          cnicbackVisible = true;
+          print(cnicBackImage!.path);
+          setState(() {});
+        }
+        break;
+      case "shop_street":
+        if (pickedFile != null) {
+          shopStreetImage = pickedFile;
+          shopStreetVisible = true;
+          print(shopStreetImage!.path);
+          setState(() {});
+        }
+        break;
+      case "shop_internal":
+        if (pickedFile != null) {
+          shopInternalImage = pickedFile;
+          shopInternalVisible = true;
+          print(shopInternalImage!.path);
+          setState(() {});
+        }
+        break;
+      case "shop_front":
+        if (pickedFile != null) {
+          shopFrontImage = pickedFile;
+          shopFrontVisible = true;
+          print(shopFrontImage!.path);
+          setState(() {});
+        }
+        break;
+      case "shop_signboard":
+        if (pickedFile != null) {
+          shopSignBoardImage = pickedFile;
+          shopSignBoardVisible = true;
+          print(shopSignBoardImage!.path);
+          setState(() {});
+        }
+        break;
+      case "person2":
+        if (pickedFile != null) {
+          secondPersonImage = pickedFile;
+          personTwoVisiable = true;
+          print(secondPersonImage!.path);
+          setState(() {});
+        }
+        break;
+      case "person3":
+        if (pickedFile != null) {
+          thirdPersonImage = pickedFile;
+          personThreeVisible = true;
+          print(thirdPersonImage!.path);
+          setState(() {});
+        }
+        break;
     }
   }
 
@@ -315,12 +386,13 @@ class _EditShopScreenState extends State<EditShopScreen> {
       "person_2": thirdPersonImage == null
           ?person.imageModel!.person2
           : thirdPersonImage,
-      "cnic_front": cincImage == null
+      "cnic_front": cincFrontImage == null
           ? person.imageModel!.cnicFront
-          : cincImage,
-      "cnic_back": cnicback == null
+          : cincFrontImage,
+      "cnic_back": cnicBackImage == null
           ? person.imageModel!.cnicBack
-          : cnicback,
+          : cnicBackImage,
+      //TODO : Add remarks fields here
     });
     print(widget.customer.id);
     var response = await dio.post(url, data: formData).then((value) => Alert(
@@ -377,6 +449,8 @@ class _EditShopScreenState extends State<EditShopScreen> {
     phoneNo2=TextEditingController(text: person.phone2.toString());
     phoneNo3=TextEditingController(text: person.phone3.toString());
     marketsController=TextEditingController(text: person.marketId.toString());
+    remarks=TextEditingController(text: "Not Good");
+    assignAmmount=TextEditingController(text: "10000");
   }
 
   @override
@@ -499,42 +573,42 @@ class _EditShopScreenState extends State<EditShopScreen> {
                           children: [
                             DividerWithTextWidget(text: "Shop"),
 
-                            ImageContainer(loading1: loading1, shopStreetImage: shopStreetImage,title: "Shop Street",
-                              onCamera: () => getImage(ImageSource.camera, loading1,shopStreetImage),
-                               onGallery: () => getImage(ImageSource.gallery, loading1,shopStreetImage),
-                              onLongPress:() {setState(() {loading1 = false;shopStreetImage = null;});},),
+                            ImageContainer(loading1: shopStreetVisible, shopStreetImage: shopStreetImage,title: "Shop Street",
+                              onCamera: () => getImage(ImageSource.camera,"shop_street"),
+                               onGallery: () => getImage(ImageSource.gallery,"shop_street"),
+                              onLongPress:() {setState(() {shopStreetVisible = false;shopStreetImage = null;});},),
 
-                            ImageContainer(loading1: loading2, shopStreetImage: shopFrontImage,title: "Shop Internal",
-                              onCamera: () => getImage(ImageSource.camera, loading2,shopFrontImage),
-                              onGallery: () => getImage(ImageSource.gallery, loading2,shopFrontImage),
-                              onLongPress:() {setState(() {loading2 = false;shopFrontImage = null;});},),
+                            ImageContainer(loading1: shopFrontVisible, shopStreetImage: shopFrontImage,title: "Shop front",
+                              onCamera: () => getImage(ImageSource.camera, "shop_front"),
+                              onGallery: () => getImage(ImageSource.gallery, "shop_front"),
+                              onLongPress:() {setState(() {shopFrontVisible = false;shopFrontImage = null;});},),
 
-                            ImageContainer(loading1: loading3, shopStreetImage: shopInternalImage,title: "Shop Internal",
-                              onCamera: () => getImage(ImageSource.camera, loading3,shopInternalImage),
-                              onGallery: () => getImage(ImageSource.gallery, loading3,shopInternalImage),
-                              onLongPress:() {setState(() {loading3 = false;shopInternalImage = null;});},),
+                            ImageContainer(loading1: shopInternalVisible, shopStreetImage: shopInternalImage,title: "Shop Internal",
+                              onCamera: () => getImage(ImageSource.camera,"shop_internal"),
+                              onGallery: () => getImage(ImageSource.gallery,"shop_internal"  ),
+                              onLongPress:() {setState(() {shopInternalVisible = false;shopInternalImage = null;});},),
 
-                            ImageContainer(loading1: loading4, shopStreetImage: shopSignBoardImage,title: "Shop Sign Board",
-                              onCamera: () => getImage(ImageSource.camera, loading4,shopSignBoardImage),
-                              onGallery: () => getImage(ImageSource.gallery, loading4,shopSignBoardImage),
-                              onLongPress:() {setState(() {loading4 = false;shopSignBoardImage = null;});},),
+                            ImageContainer(loading1: shopSignBoardVisible, shopStreetImage: shopSignBoardImage,title: "Shop Sign Board",
+                              onCamera: () => getImage(ImageSource.camera,"shop_signboard"),
+                              onGallery: () => getImage(ImageSource.gallery,"shop_signboard"),
+                              onLongPress:() {setState(() {shopSignBoardVisible = false;shopSignBoardImage = null;});},),
 
                             DividerWithTextWidget(text: "Owner"),
 
-                            ImageContainer(loading1: loading, shopStreetImage: ownerImage,title: "Owner",
-                              onCamera: () => getImage(ImageSource.camera, loading,ownerImage),
-                              onGallery: () => getImage(ImageSource.gallery, loading,ownerImage),
-                              onLongPress:() {setState(() {loading = false;ownerImage = null;});},),
+                            ImageContainer(loading1: ownerVisible, shopStreetImage: ownerImage,title: "Owner",
+                              onCamera: () => getImage(ImageSource.camera, "owner"),
+                              onGallery: () => getImage(ImageSource.gallery,"owner"),
+                              onLongPress:() {setState(() {ownerVisible = false;ownerImage = null;});},),
 
-                            ImageContainer(loading1: loading5, shopStreetImage: cincImage,title: "CNIC Front",
-                              onCamera: () => getImage(ImageSource.camera, loading5,cincImage),
-                              onGallery: () => getImage(ImageSource.gallery, loading5,cincImage),
-                              onLongPress:() {setState(() {loading5 = false;cincImage = null;});},),
+                            ImageContainer(loading1: cnicFrontVisible, shopStreetImage: cincFrontImage,title: "CNIC Front",
+                              onCamera: () => getImage(ImageSource.camera,"cnic_front"),
+                              onGallery: () => getImage(ImageSource.gallery,"cnic_front"),
+                              onLongPress:() {setState(() {cnicFrontVisible = false;cincFrontImage = null;});},),
 
-                            ImageContainer(loading1: loading6, shopStreetImage: cnicback,title: "CNIC Back",
-                              onCamera: () => getImage(ImageSource.camera, loading6,cnicback),
-                              onGallery: () => getImage(ImageSource.gallery, loading6,cnicback),
-                              onLongPress:() {setState(() {loading6 = false;cnicback = null;});},),
+                            ImageContainer(loading1: cnicbackVisible, shopStreetImage: cnicBackImage,title: "CNIC Back",
+                              onCamera: () => getImage(ImageSource.camera, "cnic_back"),
+                              onGallery: () => getImage(ImageSource.gallery, "cnic_back"),
+                              onLongPress:() {setState(() {cnicbackVisible = false;cnicBackImage = null;});},),
 
 
                             DividerWithTextWidget(text: "Customer"),
@@ -542,10 +616,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               label: "Customer Code",
                               hintText: customerCode.text,
                               onChange: (value) {
-                                customerCodeText = value;
-                                setState(() {});
-
-                              },
+                                customerCodeText = value;setState(() {});},
                               controller: customerCode,
                             ),
                             EditTextField(
@@ -561,8 +632,8 @@ class _EditShopScreenState extends State<EditShopScreen> {
                             TextFieldLabel(
                               label: "Category",
                             ),
-                          ShowDropDown(height: height,list: categories,value: categoryValue,onChange:(category) async {
-                                    setState(() {categoryValue = category!;  });},),
+                          ShowDropDown(height: height,list: categories,value: categoryValue,text:"catName",onChange:(category) async {
+                                    setState(() {categoryValue = category!;  });}, ),
         //print("Selected area is: "+sel_areas.areaCode.toString());
 
                             DividerWithTextWidget(text: "Owner"),
@@ -614,40 +685,102 @@ class _EditShopScreenState extends State<EditShopScreen> {
 
                             TextFieldLabel(label: "Country",),
 
-                            ShowDropDown(height: height,list: countries,value: countryValue,onChange:(country) async {
-                              setState(() {countryValue = country!;  });
-
-                              },),
+                            ShowDropDown(height: height,list: countries,text:"countryNick",value: countryValue,onChange:(country) async {
+                              setState(() {countryValue = country!;  },);}, ),
                             //CountryDropDown(height),
                             TextFieldLabel(label: "Provinces",),
 
-                            ShowDropDown(height: height,list: states,value: stateValue,onChange:(state) async {
+                            ShowDropDown(height: height,list: states,text:"name",value: stateValue,onChange:(state) async {
                               setState(() {stateValue = state!;  });
                               getCity(stateValue.id.toString());},),
 
                             TextFieldLabel(label: "City",),
 
-                            ShowDropDown(height: height,list: cities,value: cityValue,onChange:(city) async {
+                            ShowDropDown(height: height,list: cities,text:"name",value: cityValue,onChange:(city) async {
                               setState(() {cityValue = city!;  });
                               getArea(cityValue.id.toString());},),
 
                             TextFieldLabel(label: "Area",),
 
-                            ShowDropDown(height: height,list: areas,value: areaValue,onChange:(area) async {
+                            ShowDropDown(height: height,list: areas,value: areaValue,text:"name",onChange:(area) async {
                               setState(() {areaValue = area!;  });
                               getMarket(areaValue.id.toString());},),
 
                             TextFieldLabel(label: "Market",),
 
-                            ShowDropDown(height: height,list: markets,value: marketValue,onChange:(marketValue) async {
-                              setState(() {marketValue = marketValue!;  });},),
+                            Row(
+                              children: [
+                                Container(
+                                  width: width *0.5,
+                                  child: ShowDropDown(height: height,text:"name",list: markets,value: marketValue,onChange:(marketValue) async {
+                                    setState(() {marketValue = marketValue!;  });},),
+                                ),
+                                InkWell(
+                                    onTap: (){
+                                      setState(() {
+                                        visible = visible ? false : true;
+                                      });
+                                    },
+                                    child: Container(
+                                        margin: EdgeInsets.symmetric(
+                                            vertical: 10, horizontal: 10),
+                                        decoration: BoxDecoration(
+                                            color: themeColor1,
+                                            borderRadius: BorderRadius.circular(5)),
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 15, horizontal: 20),
+                                        child: Center(
+                                            child: Text(
+                                              "Add Market",
+                                              style:
+                                              TextStyle(color: Colors.white, fontSize: 15),
+                                            )))),
+                              ],
+                            ),
+
+                        Visibility(
+                          visible: visible,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Flexible(
+                                  child: EditTextField(
+                                    label: "Type Market Name",
+                                    hintText: "Market Name",
+                                    onChange: (value) {},
+                                    controller: marketsController,
+                                  )),
+                              InkWell(
+                                onTap: (){
+
+                                  getMarketList(marketsController.text, areaValue.id!.toInt());
+                                  marketsController.clear();
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5, horizontal: 10),
+                                  decoration: BoxDecoration(
+                                      color: themeColor1,
+                                      borderRadius: BorderRadius.circular(5)),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 20),
+                                  child: Center(
+                                      child: Text(
+                                        "ADD",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 15),
+                                      )),
+                                ),
+                              )
+                            ],
+                          )),
 
                             DividerWithTextWidget(text: "Second Contact person"),
 
-                            ImageContainer(loading1: loading7, shopStreetImage: secondPersonImage,title: "Second Person",
-                              onCamera: () => getImage(ImageSource.camera, loading7,secondPersonImage),
-                              onGallery: () => getImage(ImageSource.gallery, loading7,secondPersonImage),
-                              onLongPress:() {setState(() {loading7 = false;secondPersonImage = null;});},),
+                            ImageContainer(loading1: personTwoVisiable, shopStreetImage: secondPersonImage,title: "Second Person",
+                              onCamera: () => getImage(ImageSource.camera, "person2"),
+                              onGallery: () => getImage(ImageSource.gallery,"person2"),
+                              onLongPress:() {setState(() {personTwoVisiable = false;secondPersonImage = null;});},),
 
                             EditTextField(
                               label: "Second Contact Person Name",
@@ -663,10 +796,10 @@ class _EditShopScreenState extends State<EditShopScreen> {
 
                             DividerWithTextWidget(text: "Third Contact person"),
 
-                            ImageContainer(loading1: loading8, shopStreetImage: thirdPersonImage,title: "Thrid person",
-                              onCamera: () => getImage(ImageSource.camera, loading8,thirdPersonImage),
-                              onGallery: () => getImage(ImageSource.gallery, loading8,thirdPersonImage),
-                              onLongPress:() {setState(() {loading8 = false;thirdPersonImage = null;});},),
+                            ImageContainer(loading1: personThreeVisible, shopStreetImage: thirdPersonImage,title: "Thrid person",
+                              onCamera: () => getImage(ImageSource.camera,"person3"),
+                              onGallery: () => getImage(ImageSource.gallery,"person3"),
+                              onLongPress:() {setState(() {personThreeVisible = false;thirdPersonImage = null;});},),
 
 
                             EditTextField(
@@ -679,6 +812,22 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               hintText: phoneNo2.text,
                               onChange: (value) {
                                 phoneNo3=value;setState(() {});}, controller: phoneNo3,),
+
+                            DividerWithTextWidget(text: "Remarks"),
+                            EditTextField(
+                              label: "Remarks",
+                              hintText: remarks.text,
+                              onChange: (value) {
+                                remarks = value;setState(() {});},
+                              controller: remarks,
+                            ),
+                            EditTextField(
+                              label: "Assgin Amount",
+                              hintText: assignAmmount.text,
+                              onChange: (value) {
+                                assignAmmount = value;setState(() {});},
+                              controller: assignAmmount,
+                            ),
                             SizedBox(height: 10,),
                             SaveButton(
                               onSave: () {

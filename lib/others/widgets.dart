@@ -683,11 +683,13 @@ class ShowDropDown extends StatelessWidget {
     required this.value,
     required this.list,
     required this.onChange,
+     required this.text,
   }) : super(key: key);
 
   final double height;
   final  value;
   final List list;
+  final String text;
   final void Function(dynamic)? onChange;
 
   @override
@@ -737,20 +739,19 @@ class ShowDropDown extends StatelessWidget {
                       color: Color(
                         0xffC5C5C5,
                       )),
-                  items:
-                  list.map<DropdownMenuItem<dynamic>>((dynamic item) {
-                    return DropdownMenuItem<dynamic>(
-                      value: item,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: VariableText(
-                          text: item.catName ?? 'Not Found',
-                          fontsize: 13,
-                          weight: FontWeight.w400,
-                        ),
-                      ),
-                    );
-                  }).toList()))),
+                  items:list.map<DropdownMenuItem<dynamic>>((dynamic item) {
+          return DropdownMenuItem<dynamic>(
+          value: item,
+          child: Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: VariableText(
+          text: item.name,
+          fontsize: 13,
+          weight: FontWeight.w400,
+          ),
+          ),
+          );
+          }).toList(),))),
     );
   }
 }

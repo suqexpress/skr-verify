@@ -7,8 +7,10 @@ import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import 'package:salesmen_app/model/customerListModel.dart';
 import 'package:salesmen_app/model/customerModel.dart';
+import 'package:salesmen_app/model/user_model.dart';
 import 'package:salesmen_app/others/style.dart';
 import 'package:salesmen_app/others/widgets.dart';
 import 'package:location/location.dart' as loc;
@@ -28,7 +30,7 @@ class _MainScreenState extends State<MainScreen> {
   bool isLoading=true;
   bool _serviceEnabled = false;
   var actualAddress = "Searching....";
-  Coordinates userLatLng=Coordinates(1, 1);
+   late Coordinates userLatLng;
   List<CustomerListModel> customer=[];
   bool loading=false;
   TextEditingController search=TextEditingController();
@@ -46,7 +48,10 @@ class _MainScreenState extends State<MainScreen> {
         bool temp = await location.serviceEnabled();
         if (!temp) {
           var resquest = await location.requestPermission();
-          bool _locationService=await location.serviceEnabled();          // location.hasPermission(locationPermission.);
+          bool _locationService=await location.serviceEnabled();
+          var _location = await location.getLocation();
+          userLatLng = await Coordinates(_location.latitude, _location.longitude);
+// location.hasPermission(locationPermission.);
           if (!_locationService) {
             print('denied');
             Fluttertoast.showToast(
@@ -78,7 +83,8 @@ class _MainScreenState extends State<MainScreen> {
     var _location = await location.getLocation();
     _serviceEnabled = true;
     actualAddress = "Searching....";
-    userLatLng =Coordinates(_location.latitude, _location.longitude);
+    userLatLng = await Coordinates(_location.latitude, _location.longitude);
+    setState(() {});
     print("userLatLng: " + userLatLng.toString());
     var addresses = await Geocoder.google("AIzaSyDhBNajNSwNA-38zP7HLAChc-E0TCq7jFI").findAddressesFromCoordinates(userLatLng);
     actualAddress = addresses.first.subLocality.toString();
@@ -90,29 +96,7 @@ class _MainScreenState extends State<MainScreen> {
       loading=value;
     });
   }
-  String distance(
-      double lat1, double lon1, double lat2, double lon2, String unit) {
-    double theta = lon1 - lon2;
-    double dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) +
-        cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(deg2rad(theta));
-    dist = acos(dist);
-    dist = rad2deg(dist);
-    dist = dist * 60 * 1.1515;
-    if (unit == 'K') {
-      dist = dist * 1.609344;
-    } else if (unit == 'N') {
-      dist = dist * 0.8684;
-    }
-    return dist.toStringAsFixed(2);
-  }
 
-  double deg2rad(double deg) {
-    return (deg * pi / 180.0);
-  }
-
-  double rad2deg(double rad) {
-    return (rad * 180.0 / pi);
-  }
   getCustomer()async{
     setLoading(true);
     var dio = Dio();
@@ -148,11 +132,12 @@ class _MainScreenState extends State<MainScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    final userData = Provider.of<UserModel>(context, listen: true);
     bool _isSearching=false;
     var media = MediaQuery.of(context).size;
     double height = media.height;
     var width = media.width;
-
+    //TODO: set provider variable here and update the hard coded information with your details
     return Scaffold(
       appBar: AppBar(
         backgroundColor:themeColor1,
@@ -167,12 +152,13 @@ class _MainScreenState extends State<MainScreen> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text("Talha Iqbal"),
-              accountEmail: Text("talhaiqbal246@gmail.com"),
+
+              accountName: Text(userData.firstName.toString()),
+              accountEmail: Text(userData.phone.toString()),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.orange,
                 child: Text(
-                  "A",
+                  userData.firstName.toString().substring(0,1),
                   style: TextStyle(fontSize: 40.0,color: Colors.white),
                 ),
               ),
@@ -199,38 +185,38 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       body: SingleChildScrollView(
-      child: Stack(
-        children: [
-          loading?Container(
-              color: Colors.white.withOpacity(0.5),
-              width: width,
-              height: height* 0.87,
-              alignment: Alignment.center,
-              child: Loading()):Container(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Column(children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  InkWell(
-                      onTap:()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchScreen(customerModel: customer, lat: 1.0, long: 1.0))),
-                      child: Container(
-                          width: width * 0.7,
-                          child: SearchField(enable: false,onTap: (){}))),
-                  Container(
-                    padding: EdgeInsets.symmetric(vertical: 1,horizontal: 5),
-                    decoration: BoxDecoration(
-                      color: themeColor1,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: IconButton(onPressed: (){
-                      onStart();
-                      getCustomer();
-                    },icon: Icon(Icons.refresh,color: Colors.white,),),),
-
-                ],
-              ),
+      child:Container(
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: Column(children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              InkWell(
+                  onTap:()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchScreen(customerModel: customer, lat: 1.0, long: 1.0))),
+                  child: Container(
+                      width: width * 0.7,
+                      child: SearchField(enable: false,onTap: (){}))),
               Container(
+                padding: EdgeInsets.symmetric(vertical: 1,horizontal: 5),
+                decoration: BoxDecoration(
+                  color: themeColor1,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: IconButton(onPressed: (){
+                  onStart();
+                  getCustomer();
+                },icon: Icon(Icons.refresh,color: Colors.white,),),),
+
+            ],
+          ),
+          Stack(
+            children: [
+              loading?Container(
+                  color: Colors.white.withOpacity(0.5),
+                  width: width,
+                  height: height* 0.87,
+                  alignment: Alignment.center,
+                  child: Loading()):Container(
                 child: customer.length<1?Center(child:Text("No Shop Found")):
                 ListView.builder(
                     physics: NeverScrollableScrollPhysics(),
@@ -251,38 +237,40 @@ class _MainScreenState extends State<MainScreen> {
                       );*/
 
                         CustomerCard(
-                        height: height,
-                        width: width,
-                        f: f,
-                        menuButton: menuButton,
-                        code: customer[index].id,
-                        category: customer[index].id,
-                        shopName: customer[index].custName,
-                        address:customer[index].custAddress,
-                        name: customer[index].custName,
-                        phoneNo: customer[index].custPrimNb,
-                        lastVisit: "--",
-                        dues: "--",
-                        lastTrans:"--",
-                        outstanding: "--",
-                        lat: customer[index].lat,
-                        long: customer[index].long,
-                        customerData: customer[index],
-                        image:
-                        "https://www.google.com/imgres?imgurl=https%3A%2F%2Fimages.indianexpress.com%2F2021%2F12%2Fdoctor-strange-2-1200.jpg&imgrefurl=https%3A%2F%2Findianexpress.com%2Farticle%2Fentertainment%2Fhollywood%2Fdoctor-strange-2-suggest-benedict-cumberbatch-sorcerer-supreme-might-lead-avengers-7698058%2F&tbnid=GxuE_SM1fXrAqM&vet=12ahUKEwjr4bj575_3AhVMxqQKHSC5BRAQMygBegUIARDbAQ..i&docid=6gb_YRZyTk5MWM&w=1200&h=667&q=dr%20strange&ved=2ahUKEwjr4bj575_3AhVMxqQKHSC5BRAQMygBegUIARDbAQ",
-                        showLoading: (value) {
-                          setState(() {
-                            isLoading = value;
-                          });
-                        },
-                      );
+                          height: height,
+                          width: width,
+                          f: f,
+                          menuButton: menuButton,
+                          code: customer[index].id,
+                          category: customer[index].id,
+                          shopName: customer[index].custName,
+                          address:customer[index].custAddress,
+                          name: customer[index].custName,
+                          phoneNo: customer[index].custPrimNb,
+                          lastVisit: "--",
+                          dues: "--",
+                          lastTrans:"--",
+                          outstanding: "--",
+                          lat: customer[index].lat,
+                          long: customer[index].long,
+                          customerData: customer[index],
+                          image:
+                          "https://www.google.com/imgres?imgurl=https%3A%2F%2Fimages.indianexpress.com%2F2021%2F12%2Fdoctor-strange-2-1200.jpg&imgrefurl=https%3A%2F%2Findianexpress.com%2Farticle%2Fentertainment%2Fhollywood%2Fdoctor-strange-2-suggest-benedict-cumberbatch-sorcerer-supreme-might-lead-avengers-7698058%2F&tbnid=GxuE_SM1fXrAqM&vet=12ahUKEwjr4bj575_3AhVMxqQKHSC5BRAQMygBegUIARDbAQ..i&docid=6gb_YRZyTk5MWM&w=1200&h=667&q=dr%20strange&ved=2ahUKEwjr4bj575_3AhVMxqQKHSC5BRAQMygBegUIARDbAQ",
+                          showLoading: (value) {
+                            setState(() {
+                              isLoading = value;
+                            });
+                          },
+                        );
                     }
                 ),
               )
-            ],),
-          ),
-        ],
-      )
+
+            ],
+          )
+
+        ],),
+      ),
     ),
     );
   }

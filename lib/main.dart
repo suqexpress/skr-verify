@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
             color: Colors.blue
           )
         ),
-        home: MainScreen(),
+        home: SplashScreen(),
       ),
     );
   }
