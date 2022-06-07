@@ -340,7 +340,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
     setLoading(false);
   }
 
-  postData() async {
+  postData(String verifiedId) async {
     setLoading(true);
     var dio = Dio();
     String url = "https://erp.suqexpress.com/api/customer/edit/${widget.customer
@@ -392,6 +392,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
       "cnic_back": cnicBackImage == null
           ? person.imageModel!.cnicBack
           : cnicBackImage,
+      "verified":verifiedId,
       //TODO : Add remarks fields here
     });
     print(widget.customer.id);
@@ -558,15 +559,6 @@ class _EditShopScreenState extends State<EditShopScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      VerifiedButtons(
-                        onVerify: () {
-                          postData();
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
-                        },
-                        onUnVerify: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
-                        },
-                      ),
                       Container(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -829,12 +821,16 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               controller: assignAmmount,
                             ),
                             SizedBox(height: 10,),
-                            SaveButton(
-                              onSave: () {
-                                postData();
+                            VerifiedButtons(
+                              onVerify: () {
+                                postData(1.toString());
                                 Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
                               },
-                            )
+                              onUnVerify: () {
+                                postData(2.toString());
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
+                              },
+                            ),
                           ],
                         ),
                       )

@@ -15,24 +15,24 @@ import 'package:salesmen_app/others/style.dart';
 import 'package:salesmen_app/others/widgets.dart';
 import 'package:location/location.dart' as loc;
 import 'package:salesmen_app/screen/login_screen/login_screen.dart';
+import 'package:salesmen_app/screen/main_screeen/mainScreen.dart';
 import 'package:salesmen_app/screen/main_screeen/search_screen.dart';
 import 'package:salesmen_app/screen/notFoundScreen/notFoundScreen.dart';
-import 'package:salesmen_app/screen/unVerifiedScreen/unVerfiedScreen.dart';
 import '../../search_field.dart';
 var f = NumberFormat("###,###.0#", "en_US");
-class MainScreen extends StatefulWidget {
+class UnVerifiedScreen extends StatefulWidget {
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<UnVerifiedScreen> createState() => _UnVerifiedScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _UnVerifiedScreenState extends State<UnVerifiedScreen> {
   late List nearByCustomers=["0","0","0","0","0","0"];
   List<String> menuButton = ["DIRECTION",'EDIT SHOP'];
   bool isLoading=true;
   bool _serviceEnabled = false;
   var actualAddress = "Searching....";
-   late Coordinates userLatLng;
+  late Coordinates userLatLng;
   List<CustomerListModel> customer=[];
   bool loading=false;
   TextEditingController search=TextEditingController();
@@ -110,7 +110,7 @@ class _MainScreenState extends State<MainScreen> {
       for (var shop in response.data["data"]){
         double dist= Geolocator.distanceBetween(userLatLng.latitude, userLatLng.longitude, double.parse(shop['lat'].toString()=="null"?1.toString():shop['lat'].toString()),double.parse(shop['long'].toString()=="null"?1.toString():shop['long'].toString()));
         //calculateDistance(userLatLng.latitude, userLatLng.longitude, double.parse(shop['lat']), double.parse(shop['long'].toString()));
-        if(shop["verified"].toInt()==1) {
+        if(shop["verified"].toInt()==0) {
           customer.add(CustomerListModel.fromJson(shop, dist.toDouble()));
           debugPrint("distsnce: ${dist.toString()} $i ${customer[i].id}");
         }
@@ -118,8 +118,8 @@ class _MainScreenState extends State<MainScreen> {
 
       }
       setState(() {
-         customer.sort((a, b) => a.distance.compareTo(b.distance));
-       });
+        customer.sort((a, b) => a.distance.compareTo(b.distance));
+      });
 
     }else{
       setLoading(false);
@@ -145,7 +145,7 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor:themeColor1,
-        title: Center(child: Text("DashBoard",style: TextStyle(color: Colors.white),)),
+        title: Center(child: Text("Unverified Shop",style: TextStyle(color: Colors.white),)),
         actions: [
           Center(child: Text(actualAddress,style: TextStyle(color: Colors.white),))
         ],
@@ -164,7 +164,6 @@ class _MainScreenState extends State<MainScreen> {
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.orange,
                 child: Text(userData.firstName.toString().substring(0,1),
-                 // userData.firstName.toString().substring(0,1),
                   style: TextStyle(fontSize: 40.0,color: Colors.white),
                 ),
               ),
@@ -172,16 +171,17 @@ class _MainScreenState extends State<MainScreen> {
             ListTile(
               leading: Icon(Icons.home), title: Text("Verified Shops"),
               onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings), title: Text("Unverified Shops"),
+              leading: Icon(Icons.settings), title: Text("UnVerified Shops"),
               onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>UnVerifiedScreen()));
-                },
+                Navigator.pop(context);
+              },
             ),
             ListTile(
-              leading: Icon(Icons.contacts), title: Text("Not Found"),
+              leading: Icon(Icons.contacts), title: Text("Shops Not Found "),
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>ShopNotFound()));
               },
@@ -190,53 +190,54 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       body: SingleChildScrollView(
-      child:Container(
-        padding: EdgeInsets.symmetric(horizontal: 15),
-        child: Column(children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              InkWell(
-                  onTap:()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchScreen(customerModel: customer, lat: 1.0, long: 1.0))),
-                  child: Container(
-                      width: width * 0.7,
-                      child: SearchField(enable: false,onTap: (){}))),
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 1,horizontal: 5),
-                decoration: BoxDecoration(
-                  color: themeColor1,
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: IconButton(onPressed: (){
-                  onStart();
-                  getCustomer();
-                },icon: Icon(Icons.refresh,color: Colors.white,),),),
+        child:Container(
+          padding: EdgeInsets.symmetric(horizontal: 15),
+          child: Column(children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
 
-            ],
-          ),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              loading?Container(
-                  color: Colors.white.withOpacity(0.5),
+                InkWell(
+                    onTap:()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>SearchScreen(customerModel: customer, lat: 1.0, long: 1.0))),
+                    child: Container(
+                        width: width * 0.7,
+                        child: SearchField(enable: false,onTap: (){}))),
+                Container(
+
+                  padding: EdgeInsets.symmetric(vertical: 1,horizontal: 5),
+                  decoration: BoxDecoration(
+                    color: themeColor1,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: IconButton(onPressed: (){
+                    onStart();
+                    getCustomer();
+                  },icon: Icon(Icons.refresh,color: Colors.white,),),),
+
+              ],
+            ),
+            Stack(
+              children: [
+                loading?Container(
+                    color: Colors.white.withOpacity(0.5),
+                    width: width,
+                    height: height* 0.87,
+                    alignment: Alignment.center,
+                    child: Loading()):Container(
                   width: width,
                   height: height* 0.87,
-                  alignment: Alignment.center,
-                  child: Loading()):Container(
-                width: width,
-                height: height* 0.87,
-                child: customer.length<1?Center(child:Text("No Shop Found")):
-                SingleChildScrollView(
-                  child: Container(
-                    padding: EdgeInsets.only(bottom: 60),
-                    child: ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
+                  child: customer.length<1?Center(child:Text("No Shop Found")):
+                  SingleChildScrollView(
+                    child: Container(
+                      padding: EdgeInsets.only(bottom: 60),
+                      child: ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
 
-                        itemCount: customer.length>10?10:customer.length,
-                        itemBuilder:(context,index){
-                          return
-                            /*ListTile(
+                          itemCount: customer.length>10?10:customer.length,
+                          itemBuilder:(context,index){
+                            return
+                              /*ListTile(
                             title: Text(customer[index].custName.toString(),style: TextStyle(fontSize: 14),),
                             subtitle: Text(customer[index].custPrimNb.toString()),
                             trailing: Text(customer[index].distance.toStringAsFixed(2)),
@@ -247,44 +248,44 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                           );*/
 
-                            CustomerCard(
-                              height: height,
-                              width: width,
-                              f: f,
-                              menuButton: menuButton,
-                              code: customer[index].id,
-                              category: customer[index].id,
-                              shopName: customer[index].custName,
-                              address:customer[index].custAddress,
-                              name: customer[index].custName,
-                              phoneNo: customer[index].custPrimNb,
-                              lastVisit: "--",
-                              dues: "--",
-                              lastTrans:"--",
-                              outstanding: "--",
-                              lat: customer[index].lat,
-                              long: customer[index].long,
-                              customerData: customer[index],
-                              image:
-                              "https://www.google.com/imgres?imgurl=https%3A%2F%2Fimages.indianexpress.com%2F2021%2F12%2Fdoctor-strange-2-1200.jpg&imgrefurl=https%3A%2F%2Findianexpress.com%2Farticle%2Fentertainment%2Fhollywood%2Fdoctor-strange-2-suggest-benedict-cumberbatch-sorcerer-supreme-might-lead-avengers-7698058%2F&tbnid=GxuE_SM1fXrAqM&vet=12ahUKEwjr4bj575_3AhVMxqQKHSC5BRAQMygBegUIARDbAQ..i&docid=6gb_YRZyTk5MWM&w=1200&h=667&q=dr%20strange&ved=2ahUKEwjr4bj575_3AhVMxqQKHSC5BRAQMygBegUIARDbAQ",
-                              showLoading: (value) {
-                                setState(() {
-                                  isLoading = value;
-                                });
-                              },
-                            );
-                        }
+                              CustomerCard(
+                                height: height,
+                                width: width,
+                                f: f,
+                                menuButton: menuButton,
+                                code: customer[index].id,
+                                category: customer[index].id,
+                                shopName: customer[index].custName,
+                                address:customer[index].custAddress,
+                                name: customer[index].custName,
+                                phoneNo: customer[index].custPrimNb,
+                                lastVisit: "--",
+                                dues: "--",
+                                lastTrans:"--",
+                                outstanding: "--",
+                                lat: customer[index].lat,
+                                long: customer[index].long,
+                                customerData: customer[index],
+                                image:
+                                "https://www.google.com/imgres?imgurl=https%3A%2F%2Fimages.indianexpress.com%2F2021%2F12%2Fdoctor-strange-2-1200.jpg&imgrefurl=https%3A%2F%2Findianexpress.com%2Farticle%2Fentertainment%2Fhollywood%2Fdoctor-strange-2-suggest-benedict-cumberbatch-sorcerer-supreme-might-lead-avengers-7698058%2F&tbnid=GxuE_SM1fXrAqM&vet=12ahUKEwjr4bj575_3AhVMxqQKHSC5BRAQMygBegUIARDbAQ..i&docid=6gb_YRZyTk5MWM&w=1200&h=667&q=dr%20strange&ved=2ahUKEwjr4bj575_3AhVMxqQKHSC5BRAQMygBegUIARDbAQ",
+                                showLoading: (value) {
+                                  setState(() {
+                                    isLoading = value;
+                                  });
+                                },
+                              );
+                          }
+                      ),
                     ),
                   ),
-                ),
-              )
+                )
 
-            ],
-          )
+              ],
+            )
 
-        ],),
+          ],),
+        ),
       ),
-    ),
     );
   }
 }

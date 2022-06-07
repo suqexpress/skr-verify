@@ -831,7 +831,7 @@ class VerifiedButtons extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 40),
               child: Center(
                   child: Text(
-                    "Unverified",
+                    "No Found",
                     style: TextStyle(color: Colors.white, fontSize: 18),
                   )),
             ),
