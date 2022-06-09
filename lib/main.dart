@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
             color: themeColor1
           )
         ),
-        home: MainScreen(),
+        home: SplashScreen(),
       ),
     );
   }

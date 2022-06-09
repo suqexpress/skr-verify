@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:map_launcher/map_launcher.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:salesmen_app/others/style.dart';
 import 'package:salesmen_app/screen/edit_shop/edit_shop_screen.dart';
 
@@ -485,7 +487,7 @@ class _CustomerCardState extends State<CustomerCard> {
                         if(index==1){
                           Navigator.push(context, MaterialPageRoute(builder: (context)=>EditShopScreen(customer: widget.customerData,)));
                         }
-                     },
+
                     //   // if (index == 1) {
                     //   //   if (templat == null) {
                     //   //     Fluttertoast.showToast(
@@ -557,16 +559,36 @@ class _CustomerCardState extends State<CustomerCard> {
                     //           backgroundColor: Colors.black87,
                     //           textColor: Colors.white,
                     //           fontSize: 16.0);
-                    //     } else {
-                    //       if (await MapLauncher.isMapAvailable(MapType.google)) {
-                    //         await MapLauncher.showMarker(
-                    //           mapType: MapType.google,
-                    //           coords: Coords(widget.lat, widget.long),
-                    //           title: widget.shopName,
-                    //           description: widget.address,
-                    //         );
-                    //       }
-                    //       // }
+                            else {
+                          if (await MapLauncher.isMapAvailable(MapType.google)!=null) {
+                            await MapLauncher.showMarker(
+                              mapType: MapType.google,
+                              coords: Coords(widget.lat, widget.long),
+                              title: widget.shopName,
+                              description: widget.address,
+                            );
+                          }else{
+                            Alert(
+                              context: context,
+                              type: AlertType.error,
+                              title: "Shop Location not Found",
+                              desc: "Please check user location and google map in your phone",
+                              buttons: [
+                                DialogButton(
+                                  child: Text(
+                                    "Cancel",
+                                    style: TextStyle(color: Colors.white, fontSize: 20),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  width: 120,
+                                )
+                              ],
+                            ).show();
+                          }
+                            }
+                     },
                     //     }
                     //   }
                     // },

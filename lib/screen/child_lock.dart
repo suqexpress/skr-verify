@@ -25,7 +25,7 @@ class _ChildLockState extends State<ChildLock> {
     var date=DateTime.now();
     var day=date.toString().substring(5,7);
     var month=date.toString().substring(8,10);
-    todayDate=day.toString() +month.toString();
+    todayDate=month.toString()+day.toString();
     setState(() {});
     super.initState();
 
@@ -54,6 +54,7 @@ class _ChildLockState extends State<ChildLock> {
                   autoDismissKeyboard: true,
                   enableActiveFill: true,
                   onCompleted: (value)async{
+                    print(todayDate);
                     if(value==todayDate){
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
                     }
