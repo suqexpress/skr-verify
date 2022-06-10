@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:map_launcher/map_launcher.dart';
@@ -486,108 +487,33 @@ class _CustomerCardState extends State<CustomerCard> {
                        _onSelected(index);
                         if(index==1){
                           Navigator.push(context, MaterialPageRoute(builder: (context)=>EditShopScreen(customer: widget.customerData,)));
-                        }
-
-                    //   // if (index == 1) {
-                    //   //   if (templat == null) {
-                    //   //     Fluttertoast.showToast(
-                    //   //         msg: 'Please Enable Your Location',
-                    //   //         toastLength: Toast.LENGTH_SHORT,
-                    //   //         backgroundColor: Colors.black87,
-                    //   //         textColor: Colors.white,
-                    //   //         fontSize: 16.0);
-                    //   //     //checkAndGetLocation();
-                    //   //   } else {
-                    //   //     if(widget.shopAssigned == 'Yes'){
-                    //   //       // if (double.parse(userData.usercashReceive) >=
-                    //   //       //     double.parse(userData.usercashLimit) ||
-                    //   //       //     double.parse(userData.usercashReceive) < 0) {
-                    //   //       //   limitReachedPopup(
-                    //   //       //       context: context,
-                    //   //       //       height: widget.height,
-                    //   //       //       width: widget.width);
-                    //   //
-                    //   //         ///for testing
-                    //   //         /*widget.showLoading(true);
-                    //   //         await PostEmployeeVisit(
-                    //   //             customerCode:
-                    //   //                 widget.customerData.customerCode,
-                    //   //             purpose: 'Check In',
-                    //   //             lat: templat.toString(),
-                    //   //             long: templong.toString(),
-                    //   //             customerData: widget.customerData);
-                    //   //         widget.showLoading(false);*/
-                    //   //       } else
-                    //   if (index == 1) {
-                    //     widget.showLoading(true);
-                    //     // await PostEmployeeVisit(
-                    //     //     customerCode:
-                    //     //     widget.customerData.customerCode,
-                    //     //     purpose: 'Check In',
-                    //     //     lat: templat.toString(),
-                    //     //     long: templong.toString(),
-                    //     //     customerData: widget.customerData);
-                    //     if (widget.shopAssigned == "Yes") {
-                    //       Provider.of<RetrunCartModel>(context, listen: false)
-                    //           .retruncreateCart();
-                    //       Navigator.push(
-                    //           context,
-                    //           MaterialPageRoute(
-                    //               builder: (context) => CheckIn(
-                    //                 code: widget.code,
-                    //                 name: widget.shopName,
-                    //                 image: widget.image,
-                    //                 customerData: widget.customerData,
-                    //               )));
-                    //     } else {
-                    //       Fluttertoast.showToast(
-                    //           msg: 'Shop not Assigned',
-                    //           toastLength: Toast.LENGTH_SHORT,
-                    //           backgroundColor: Colors.black87,
-                    //           textColor: Colors.white,
-                    //           fontSize: 16.0);
-                    //     }
-                    //     widget.showLoading(false);
-                    //   } else if (index == 0) {
-                    //     ///Launch Map
-                    //     if (widget.lat == null) {
-                    //       Fluttertoast.showToast(
-                    //           msg: "Shop location not found",
-                    //           toastLength: Toast.LENGTH_SHORT,
-                    //           gravity: ToastGravity.BOTTOM,
-                    //           timeInSecForIosWeb: 3,
-                    //           backgroundColor: Colors.black87,
-                    //           textColor: Colors.white,
-                    //           fontSize: 16.0);
-                            else {
-                          if (await MapLauncher.isMapAvailable(MapType.google)!=null) {
+                        }else if (index == 0) {
+                          if (widget.lat ==
+                              null) {
+                            Fluttertoast.showToast(
+                                msg: "Shop location not found",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 3,
+                                backgroundColor: Colors.black87,
+                                textColor: Colors.white,
+                                fontSize: 16.0);
+                          }else{
+                            await MapLauncher.isMapAvailable(
+                                MapType.google);
                             await MapLauncher.showMarker(
                               mapType: MapType.google,
-                              coords: Coords(widget.lat, widget.long),
-                              title: widget.shopName,
-                              description: widget.address,
+                              coords: Coords(
+                                  widget.long,
+                                  widget
+                                      .lat),
+                              title:
+                              widget.shopName,
+                              description:
+                              widget.address,
                             );
-                          }else{
-                            Alert(
-                              context: context,
-                              type: AlertType.error,
-                              title: "Shop Location not Found",
-                              desc: "Please check user location and google map in your phone",
-                              buttons: [
-                                DialogButton(
-                                  child: Text(
-                                    "Cancel",
-                                    style: TextStyle(color: Colors.white, fontSize: 20),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  width: 120,
-                                )
-                              ],
-                            ).show();
                           }
-                            }
+                        }
                      },
                     //     }
                     //   }

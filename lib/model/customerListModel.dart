@@ -25,7 +25,7 @@ class CustomerListModel {
     id = json['id'];
     custName = json['cust_name'];
     lat = double.parse(json['lat'].toString()=="null"?1.toString():json['lat'].toString());
-    long = double.parse(json['lat'].toString()=="null"?1.toString():json['lat'].toString());
+    long = double.parse(json['long'].toString()=="null"?1.toString():json['long'].toString());
     verified = json['verified'];
     custAddress = json['cust_address'];
     salemanName = json['saleman_name'];
