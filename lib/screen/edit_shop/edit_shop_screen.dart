@@ -1,3 +1,5 @@
+import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -109,7 +111,6 @@ class _EditShopScreenState extends State<EditShopScreen> {
     print(actualAddress);
     setState(() {});
   }
-
   getImage(ImageSource source,String image) async {
     var camera = await Permission.camera.request();
     var gallery = await Permission.storage.request();
@@ -123,75 +124,75 @@ class _EditShopScreenState extends State<EditShopScreen> {
         if (pickedFile != null) {
           ownerImage = pickedFile;
           ownerVisible = true;
-          print(ownerImage!.path);
+          details["owner"]=ownerImage;
           setState(() {
           });
-        }
+        }else{details.remove("owner");}
         break;
       case  "cnic_front":
         if (pickedFile != null) {
           cincFrontImage = pickedFile;
           cnicFrontVisible = true;
-          print(cincFrontImage!.path);
+          details["cnic_front"]=cincFrontImage;
           setState(() {
           });
-        }
+        }else{details.remove("cnic_front");}
         break;
       case "cnic_back":
         if (pickedFile != null) {
           cnicBackImage = pickedFile;
           cnicbackVisible = true;
-          print(cnicBackImage!.path);
+          details["cnic_back"]=cnicBackImage;
           setState(() {});
-        }
+        }else{details.remove("cnic_back");}
         break;
       case "shop_street":
         if (pickedFile != null) {
           shopStreetImage = pickedFile;
           shopStreetVisible = true;
-          print(shopStreetImage!.path);
+          details["shop_street"]=shopStreetImage;
           setState(() {});
-        }
+        }else{details.remove("shop_street");}
         break;
       case "shop_internal":
         if (pickedFile != null) {
           shopInternalImage = pickedFile;
           shopInternalVisible = true;
-          print(shopInternalImage!.path);
+          details["shop_internal"]=shopInternalImage;
           setState(() {});
-        }
+        }else{details.remove("shop_internal");}
         break;
       case "shop_front":
         if (pickedFile != null) {
           shopFrontImage = pickedFile;
           shopFrontVisible = true;
-          print(shopFrontImage!.path);
+          details["shop_front"]=shopFrontImage;
           setState(() {});
-        }
+        }else{details.remove("shop_front");}
         break;
       case "shop_signboard":
         if (pickedFile != null) {
           shopSignBoardImage = pickedFile;
           shopSignBoardVisible = true;
-          print(shopSignBoardImage!.path);
+          details["shop_sign_board"]=shopSignBoardImage;
           setState(() {});
-        }
+        }else{details.remove("shop_sign_board");}
         break;
       case "person2":
         if (pickedFile != null) {
           secondPersonImage = pickedFile;
           personTwoVisiable = true;
-          print(secondPersonImage!.path);
+          details["contact_person2"]=secondPersonImage;
           setState(() {});
-        }
+        }else{details.remove("contact_person2");}
         break;
       case "person3":
         if (pickedFile != null) {
           thirdPersonImage = pickedFile;
           personThreeVisible = true;
-          print(thirdPersonImage!.path);
+          details["contact_person3"]=thirdPersonImage;
           setState(() {});
-        }
+        }else{details.remove("contact_person3");}
         break;
     }
   }
@@ -272,7 +273,8 @@ class _EditShopScreenState extends State<EditShopScreen> {
           break;
         }
       }
-    }else{
+    }
+    else{
       areas.add(AreaModel(id:1 ,name:"Please select the Area", cityId:2 ,createdAt:"211212" ,updatedAt:"121212" ,deletedAt: "212"),);
       setState(() {
         areaValue=areas.last;
@@ -305,7 +307,6 @@ class _EditShopScreenState extends State<EditShopScreen> {
 
   getCustomer()async{
     setLoading(true);
-    var dio=Dio();
     print(widget.customer.id);
     var response=  OnlineDatabase().getCustomer(widget.customer.id.toString(), (value)=>saveInfo(value), (error)=>
       Alert(
@@ -336,65 +337,28 @@ class _EditShopScreenState extends State<EditShopScreen> {
       if(category.id==person.custcatId){
         categoryValue=category;
       }
+
+        print("cat id: ${category.id}");
+    }
+    if(categoryValue.id==null){
+      categoryValue.id=1;
+      categoryValue.name="select category";
     }
     setLoading(false);
   }
-
+  printJson(){
+    setState(() {});
+    print(details);
+  }
   postData(String verifiedId) async {
     setLoading(true);
     var dio = Dio();
-    String url = "https://erp.suqexpress.com/api/customer/edit/${widget.customer
-        .id}";
-    FormData formData = new FormData.fromMap({
-      "cust_old_code": customerCodeText==null?customerCode.text:customerCodeText,
-      "first_name": shopNameText==null? shopName.text:shopNameText,
-      "custcat_id": person.custcatId==categoryValue.id?category.text:categoryText,
-      "cust_prim_name" :ownerNameText==null?ownerName.text:ownerNameText,
-      "cust_prim_name":  ownerNameText==null? ownerNo.text:ownerNameText,
-      "cnic":ownerCNICText==null? ownerCNIC.text:ownerCNICText,
-      "cnic_exp": expireDateCNICText==null? expireDateCNIC.text:expireDateCNICText,
-      "cust_address": customerAddressText==null?customerAddress.text:customerAddressText,
-      "country_id":person.countryId == countryValue.id ? person.countryId : countryValue.id,
-      "prov_id":person.provId == stateValue.id ? person
-          .provId : stateValue.id,
-      "city_id": person.cityId == cityValue.id
-          ?person.cityId
-          : cityValue.id,
-      "area_id": person.areaId == areaValue.id
-          ? person.areaId
-          : areaValue.id,
-      "market_id": person.marketId == marketValue.id ?person
-          .marketId : marketValue.id,
-      "contact_person2": person2Text==null? person2.text:person2Text,
-      "phone2": phoneNo2Text==null?phoneNo2.text:person2Text,
-      "contact_person3": person3Text==null? person3.text:person3Text,
-      "phone3":phoneNo3Text==null? phoneNo3.text:phoneNo3Text,
-      //images
-      "owner": ownerImage == null
-          ? person.imageModel!.owner
-          : ownerImage,
-      "shop_front": shopFrontImage == null ? person.imageModel!
-          .shopFront : shopFrontImage,
-      "shop_internal": shopInternalImage == null ? person.imageModel!
-          .shopInternal : shopInternalImage,
-      "shop_sign_board": shopSignBoardImage == null ? person
-          .imageModel!.shopSignBoard : shopSignBoardImage,
-      "shop_street": shopStreetImage == null ? person.imageModel!
-          .shopStreet : shopStreetImage,
-      "person_1": secondPersonImage == null ?person.imageModel!
-          .person1 : secondPersonImage,
-      "person_2": thirdPersonImage == null
-          ?person.imageModel!.person2
-          : thirdPersonImage,
-      "cnic_front": cincFrontImage == null
-          ? person.imageModel!.cnicFront
-          : cincFrontImage,
-      "cnic_back": cnicBackImage == null
-          ? person.imageModel!.cnicBack
-          : cnicBackImage,
-      "verified":verifiedId,
-      //TODO : Add remarks fields here
-    });
+    String url = "https://erp.suqexpress.com/api/customer/edit/${widget.customer.id}";
+    print(details);
+    details["verified"]=verifiedId;
+    FormData formData = new FormData.fromMap(details);
+
+
     print(widget.customer.id);
     var response = await dio.post(url, data: formData).then((value) => Alert(
       context: context,
@@ -413,7 +377,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
           width: 120,
         )
       ],
-    ).show()).catchError((e)=>Alert(
+    ).show().then((value) => Navigator.push(context, MaterialPageRoute(builder:(context)=>MainScreen())))).catchError((e)=>Alert(
       context: context,
       type: AlertType.error,
       title: "Edit Fail",
@@ -433,6 +397,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
     ).show());
     setLoading(false);
   }
+  Map<String, dynamic> details = new HashMap();
 
   saveInfo(value){
     print(value);
@@ -450,8 +415,8 @@ class _EditShopScreenState extends State<EditShopScreen> {
     phoneNo2=TextEditingController(text: person.phone2.toString());
     phoneNo3=TextEditingController(text: person.phone3.toString());
     marketsController=TextEditingController(text: person.marketId.toString());
-    remarks=TextEditingController(text: "Not Good");
-    assignAmmount=TextEditingController(text: "10000");
+    remarks=TextEditingController(text: person.userData!.remarks);
+    assignAmmount=TextEditingController(text: person.userData!.amount.toString());
   }
 
   @override
@@ -608,16 +573,25 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               label: "Customer Code",
                               hintText: customerCode.text,
                               onChange: (value) {
-                                customerCodeText = value;setState(() {});},
-                              controller: customerCode,
+                                if(value.toString().length>0){
+                                  details["cust_old_code"]=value;
+                                }else{
+
+                                details["cust_old_code"]=value;
+                                }
+                              },
+                              //   customerCodeText = value;setState(() {});},
+                               controller: customerCode,
                             ),
                             EditTextField(
                               label: "Customer Shop",
                               hintText: shopName.text,
                               onChange: (value) {
-                                shopNameText = value;
-                                setState(() {});
-
+                                if(value.toString().length>0){
+                                 details["first_name"]=value;
+                                }else{
+                                  details.remove("first_name");
+                                }
                               },
                               controller: shopName,
                             ),
@@ -625,7 +599,14 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               label: "Category",
                             ),
                           ShowDropDown(height: height,list: categories,value: categoryValue,text:"catName",onChange:(category) async {
-                                    setState(() {categoryValue = category!;  });}, ),
+                            setState(() {categoryValue = category!;  });
+                                    if(categoryValue.id==person.custcatId){
+                                      details.remove("custcat_id");
+                                    }
+                                    else{
+                                      details["custcat_id"]=categoryValue.id;
+                                    }
+                                    }, ),
         //print("Selected area is: "+sel_areas.areaCode.toString());
 
                             DividerWithTextWidget(text: "Owner"),
@@ -633,8 +614,11 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               label: "Owner Name",
                               hintText: ownerName.text,
                               onChange: (value) {
-                                ownerNameText = value;
-                                setState(() {});
+                                if(value.toString().length>0){
+                                  details["cust_prim_name"]=value;
+                                }else{
+                                  details.remove("cust_prim_name");
+                                }
 
                               },
                               controller: ownerName,
@@ -643,8 +627,11 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               label: "Owner Number",
                               hintText: ownerNo.text,
                               onChange: (value) {
-                                ownerNoText =  value;
-                                setState(() {});
+                                if(value.toString().length>0){
+                                  details["cust_prim_nb"]=value;
+                                }else{
+                                  details.remove("cust_prim_nb");
+                                }
 
                               },
                               controller: ownerNo,
@@ -653,8 +640,11 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               label: "Owner CNIC",
                               hintText: ownerCNIC.text,
                               onChange: (value) {
-                                ownerCNICText =  value;
-                                setState(() {});
+                                if(value.toString().length>0){
+                                  details["cnic"]=value;
+                                }else{
+                                  details.remove("cnic");
+                                }
 
                               },
                               controller: ownerCNIC,
@@ -663,39 +653,81 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               label: "CNIC EXPIRE DATE",
                               hintText: expireDateCNIC.text,
                               onChange: (value) {
-                                expireDateCNICText =  value;
-                                setState(() {});
+                                if(value.toString().length>0){
+                                  details["cnic_exp"]=value;
+                                }else{
+                                  details.remove("cnic_exp");
+                                }
 
                               },
                               controller: expireDateCNIC,
                             ),
                             DividerWithTextWidget(text: "Address"),
-                            LocationButton(width: width, customerAddress: customerAddress ,onPressed: (){
-                              customerAddress=TextEditingController(text: actualAddress);
+                            LocationButton(width: width, customerAddress: customerAddress ,onChange:(value) {customerAddress=TextEditingController(text:value);
+                              setState(() {
+
+                              });
+                            if(value.toString().length>0){
+                              details["cust_address"]=value;
+                            }else{
+                              details.remove("cust_address");
+                            }
+                              },onPressed: (){
+                              customerAddress=TextEditingController(text:actualAddress);
+                              if(actualAddress.toString().length>0){
+                                details["cust_address"]=actualAddress;
+                              }else{
+                                details.remove("cust_address");
+                              }
                                setState(() {});
                             },),
 
                             TextFieldLabel(label: "Country",),
 
                             ShowDropDown(height: height,list: countries,text:"countryNick",value: countryValue,onChange:(country) async {
-                              setState(() {countryValue = country!;  },);}, ),
+                              setState(() {countryValue = country!;  },);
+                              if(countryValue.id==person.countryId){
+                                details.remove("country_id");
+                              }
+                              else{
+                                details["country_id"]=countryValue.id;
+                              }
+                              }, ),
                             //CountryDropDown(height),
                             TextFieldLabel(label: "Provinces",),
 
                             ShowDropDown(height: height,list: states,text:"name",value: stateValue,onChange:(state) async {
                               setState(() {stateValue = state!;  });
+                              if(stateValue.id==person.provId){
+                                details.remove("prov_id");
+                              }
+                              else{
+                                details["prov_id"]=stateValue.id;
+                              }
                               getCity(stateValue.id.toString());},),
 
                             TextFieldLabel(label: "City",),
 
                             ShowDropDown(height: height,list: cities,text:"name",value: cityValue,onChange:(city) async {
                               setState(() {cityValue = city!;  });
+                              if(cityValue.id==person.cityId){
+                                details.remove("city_id");
+                              }
+                              else{
+                                details["city_id"]=cityValue.id;
+                              }
                               getArea(cityValue.id.toString());},),
 
                             TextFieldLabel(label: "Area",),
 
                             ShowDropDown(height: height,list: areas,value: areaValue,text:"name",onChange:(area) async {
-                              setState(() {areaValue = area!;  });
+                              setState(() {areaValue = area;  });
+                              if(areaValue.id==person.areaId){
+                                details.remove("area_id");
+                              }
+                              else{
+                                details["area_id"]=areaValue.id;
+                              }
                               getMarket(areaValue.id.toString());},),
 
                             TextFieldLabel(label: "Market",),
@@ -704,8 +736,15 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               children: [
                                 Container(
                                   width: width *0.5,
-                                  child: ShowDropDown(height: height,text:"name",list: markets,value: marketValue,onChange:(marketValue) async {
-                                    setState(() {marketValue = marketValue!;  });},),
+                                  child: ShowDropDown(height: height,text:"name",list: markets,value: marketValue,onChange:(market) async {
+                                    setState(() {marketValue = market!;  });
+                                    if(marketValue.id==person.marketId){
+                                      details.remove("market_id");
+                                    }
+                                    else{
+                                      details["market_id"]=marketValue.id;
+                                    }
+                                    },),
                                 ),
                                 InkWell(
                                     onTap: (){
@@ -729,7 +768,7 @@ class _EditShopScreenState extends State<EditShopScreen> {
                                             )))),
                               ],
                             ),
-
+                        //TODO:// check add market
                         Visibility(
                           visible: visible,
                           child: Row(
@@ -778,13 +817,21 @@ class _EditShopScreenState extends State<EditShopScreen> {
                               label: "Second Contact Person Name",
                               hintText: person2.text,
                               onChange: (value) {
-                                person2Text=value;setState(() {});},
+                                if(value.toString().length>0){
+                                  details["contact_person2"]=value;
+                                }else{
+                                  details.remove("contact_person2");
+                                }},
                               controller: person2,),
 
                             EditTextField(
                               label: "Second Contact person Number",
                               hintText: phoneNo2.text,
-                              onChange: (value) {phoneNo2Text=value;setState(() {});}, controller: phoneNo2,),
+                              onChange: (value) {if(value.toString().length>0){
+                                details["phone2"]=value;
+                              }else{
+                                details.remove("phone2");
+                              }}, controller: phoneNo2,),
 
                             DividerWithTextWidget(text: "Third Contact person"),
 
@@ -797,38 +844,55 @@ class _EditShopScreenState extends State<EditShopScreen> {
                             EditTextField(
                               label: "Third Contact Person Name",
                               hintText:person3.text,
-                              onChange: (value) {person2Text=value;setState(() {});}, controller: person3,),
+                              onChange: (value) {if(value.toString().length>0){
+                                details["contact_person3"]=value;
+                              }else{
+                                details.remove("contact_person3");
+                              }}, controller: person3,),
 
                             EditTextField(
                               label: "ThirdContact person Number",
-                              hintText: phoneNo2.text,
+                              hintText: phoneNo3.text,
                               onChange: (value) {
-                                phoneNo3=value;setState(() {});}, controller: phoneNo3,),
+                                if(value.toString().length>0){
+                                  details["phone3"]=value;
+                                }else{
+                                  details.remove("phone3");
+                                }}, controller: phoneNo3,),
 
                             DividerWithTextWidget(text: "Remarks"),
                             EditTextField(
                               label: "Remarks",
                               hintText: remarks.text,
                               onChange: (value) {
-                                remarks = value;setState(() {});},
+                                if(value.toString().length>0){
+                                  details["remarks"]=value;
+                                }else{
+                                  details.remove("remarks");
+                                }},
                               controller: remarks,
                             ),
                             EditTextField(
                               label: "Assgin Amount",
                               hintText: assignAmmount.text,
                               onChange: (value) {
-                                assignAmmount = value;setState(() {});},
+                                if(value.toString().length>0){
+                                  details["allowed_limit"]=value;
+                                }else{
+                                  details.remove("allowed_limit");
+                                }},
                               controller: assignAmmount,
                             ),
                             SizedBox(height: 10,),
                             VerifiedButtons(
                               onVerify: () {
+                                printJson();
                                 postData(1.toString());
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
+                               // Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
                               },
                               onUnVerify: () {
                                 postData(2.toString());
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
+                               // Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen()));
                               },
                             ),
                           ],

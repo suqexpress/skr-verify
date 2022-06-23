@@ -236,17 +236,6 @@ class _MainScreenState extends State<MainScreen> {
                         itemCount: customer.length>10?10:customer.length,
                         itemBuilder:(context,index){
                           return
-                            /*ListTile(
-                            title: Text(customer[index].custName.toString(),style: TextStyle(fontSize: 14),),
-                            subtitle: Text(customer[index].custPrimNb.toString()),
-                            trailing: Text(customer[index].distance.toStringAsFixed(2)),
-                            leading: CircleAvatar(
-                              radius: 30,
-                              backgroundColor: customer[index].verified==0?Colors.grey:themeColor1,
-                              child: Text("V",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.bold),),
-                            ),
-                          );*/
-
                             CustomerCard(
                               height: height,
                               width: width,

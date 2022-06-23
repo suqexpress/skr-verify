@@ -201,6 +201,8 @@ class CustomerModel {
 class UserData {
   int? id;
   String? firstName;
+  String? remarks;
+  int? amount;
   String? lastName;
   Null? email;
   String? phone;
@@ -218,6 +220,8 @@ class UserData {
         this.email,
         this.phone,
         this.image,
+        this.remarks,
+        this.amount,
         this.isActive,
         this.appLogin,
         this.webLogin,
@@ -236,6 +240,8 @@ class UserData {
     webLogin = json['web_login'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
+    remarks ="Good";
+    amount =000;
   }
 
   Map<String, dynamic> toJson() {

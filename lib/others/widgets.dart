@@ -920,11 +920,13 @@ class LocationButton extends StatelessWidget {
     required this.width,
     required this.customerAddress,
     required this.onPressed,
+    required this.onChange
   }) : super(key: key);
 
   final double width;
   final TextEditingController customerAddress;
   final void Function()? onPressed;
+  final void Function(dynamic) onChange;
 
   @override
   Widget build(BuildContext context) {
@@ -938,7 +940,7 @@ class LocationButton extends StatelessWidget {
             child: EditTextField(
               label: "Customer Address",
               hintText: customerAddress.text,
-              // onChange: (value) {},
+               onChange: onChange,
               controller: customerAddress,
             ),
           ),
